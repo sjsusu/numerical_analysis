@@ -130,14 +130,12 @@ def integer_to_binary(integer):
         else:
             dividend = quotient
 
-    # Reverse Order
-    integer_binary = integer_binary[::-1]
-
-    # Remove leading zeros
-    while integer_binary and integer_binary[0] == "0":
+    # Remove trailing zeros
+    while integer_binary and integer_binary[-1] == "0":
         integer_binary.pop()
 
-    return integer_binary
+    # Return reversed binary
+    return integer_binary[::-1]
 
 
 def fraction_to_binary(fraction, integer_binary):
