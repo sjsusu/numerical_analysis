@@ -1,0 +1,165 @@
+\documentclass[12pt]{article}
+
+\usepackage{cmbright}
+\usepackage[T1]{fontenc}
+\renewcommand*\familydefault{\sfdefault}
+
+\usepackage[margin=2cm]{geometry} %This command widens the margins
+
+\usepackage[parfill]{parskip}
+\linespread{1.2} 
+
+\usepackage{fancyhdr}
+\pagestyle{fancy} 
+\lhead{Math 5334: \emph{Numerical Analysis}}
+\rhead{Serena Su}
+
+
+\begin{document}
+
+\begin{center}
+\textbf{\huge Assignment 1 : Binary Encoding}
+
+{\Large{Coding Documentation}}
+
+{\large\emph{Due Date: September 12, 2025}}
+\vspace{1em}
+\end{center}
+
+\hrule
+
+\smallskip
+
+\section*{Introduction}
+The goal of this assignment is to write a program that converts a decimal number string into IEEE-754 64-bit binary. To complete this task, I wrote a Python script that takes a decimal number as input and outputs its binary representation in IEEE-754 64-bit format.
+
+\section*{Cases Handled}
+The following cases are considered:
+\begin{itemize}
+    \item Invalid inputs (non-numeric strings)
+    \item Infinity (+ / -)
+    \item NaN 
+    \item Zero (+ / -)
+    \item Subnormal numbers (+ / -)
+    \item Decimals that are too large to be represented in IEEE-754 64-bit format
+    \item General case for valid decimal numbers within the representable range.
+\end{itemize}
+
+\section*{Algorithm}
+The algorithm follows these general steps:
+\begin{enumerate}
+    \item Parse the input string and validate that it is a decimal number.
+    \item Handle special cases (e.g., NaN, Infinity, Zero).
+    \item Check the magnitude of the number to determine if it is subnormal or too large for IEEE-754 64-bit representation.
+    \item Convert the valid decimal number to its binary representation.
+    \begin{enumerate}
+        \item Determine the sign bit (0 for positive, 1 for negative).
+        \item Separate the number into its integer and fractional parts.
+        \item Convert both parts to binary, rounding/appending to keep 53 significant bits for the mantissa (pre-normalization) as needed.
+        \item Find the exponent.
+        \item Calculate the biased exponent and its binary representation. Then prepending with leading zeros to ensure it is 11 bits long if needed.
+        \item Combine the integer and fractional binary parts to form the mantissa.
+        \item Normalize the mantissa to 52 bits.
+        \item Combine the sign, exponent, and mantissa to form the final binary representation.
+    \end{enumerate}
+\end{enumerate}
+\textbf{Note:} Extra exception handling occurs in steps 4b and 4d to ensure that conversion is possible within the default precision (28 significant digits) of the Decimal object. Due to this limitation, the actual range of representable numbers in this program is roughly 1e-14 to 1e27.
+
+\section*{Function Documentation}
+\subsection*{Main Function\\} 
+\hrule
+{\large\texttt{decimal\_to\_binary(num\_string)}}
+
+\textbf{Description:}
+
+This function takes a decimal (string) and returns the number in IEEE 754 64-bit binary form (string). The returned string has spaces to indicate the sign, exponent, and fraction.
+
+\begin{description}
+    \item[Parameters:] 
+    \item \texttt{num\_string} : \texttt{(string)} The decimal provided from user input.
+
+    \item[Returns:] 
+    \item \texttt{string : num\_string} converted to IEEE 754 64-bit binary. Formatted as ``sign exponent\\ fraction''.
+
+    \item[Raises:] 
+    \item \texttt{TypeError:} If the input is not a valid decimal number.
+    \item \texttt{ValueError:} If the input is too large for IEEE 754 64-bit conversion, or if the Decimal object cannot represent the input with its default precision. \\
+\end{description}
+
+\hrule
+\subsection*{Helper Functions\\}
+\hrule
+{\large\texttt{integer\_to\_binary(integer)}}
+
+\textbf{Description:}
+
+This function takes an integer and returns its binary representation as a list of chars. Returns an empty list if the integer entered is any form of 0.
+
+\begin{description}
+    \item[Parameters:] 
+    \item \texttt{integer} : \texttt{(int} or \texttt{float)} The integer to be converted into binary.
+
+    \item[Returns:] 
+    \item \texttt{list :} The binary representation of the integer as an ordered list. Each index contains a `0` or `1`.\\
+\end{description}
+
+\hrule 
+
+{\large\texttt{fraction\_to\_binary(fraction, integer\_binary)}}
+
+\textbf{Description:}
+
+This function takes the fractional portion of a number (as a Decimal object) and returns a tuple containing:
+\begin{enumerate}
+    \item The binary representation of the fraction as a list of chars.
+    \item The (possibly rounded) binary representation of the integer part.
+\end{enumerate}
+The length of the binary fraction list is determined by the number of bits remaining in the mantissa after accounting for the integer part.
+
+\begin{description}
+    \item[Parameters:] 
+    \item \texttt{fraction} : \texttt{(Decimal)} The fractional portion of the number to be converted into binary.
+    \item \texttt{integer\_binary} : \texttt{(list of string)} The binary representation of the integer portion as a list of '0' and '1' chars. Used to calculate the remaining bits in the mantissa before normalization.
+
+    \item[Returns:] 
+    \item \texttt{tuple (list of string, list of string) :}
+    \begin{itemize}
+        \item \texttt{tuple[0]: list of string} 
+        
+        Contains the binary representation of the fraction as an ordered list of '0' and '1' chars.
+        \item \texttt{tuple[1]: list of string} 
+        
+        Contains either a rounded version of \texttt{integer\_binary} (if rounding occurs) or a copy of the original \texttt{integer\_binary}. \\
+    \end{itemize}
+\end{description}
+
+\hrule 
+
+{\large\texttt{round\_up(binary)}}
+
+\textbf{Description:}
+
+This function is a helper for \texttt{fraction\_to\_binary()}.
+
+It rounds up the given binary number (provided as a list of '0' and '1' chars), starting from the least significant bit, \emph{without prepending a new bit}. 
+
+It returns a tuple containing:
+\begin{enumerate}
+    \item The rounded binary number as a list of '0' and '1' chars.
+    \item A boolean indicating whether a '1' needs to be appended to the beginning from rounding.
+\end{enumerate}
+
+\begin{description}
+    \item[Parameters:]
+    \item \texttt{binary} : \texttt{(list of string)} The binary representation of a number as an ordered list of '0' and '1' chars.
+
+    \item[Returns:]
+    \item \texttt{tuple (list of string, bool) :}
+    \begin{itemize}
+        \item \texttt{list of string:} The first element is the rounded binary number as a list of '0' and '1' chars.
+        \item \texttt{bool:} The second element is a boolean indicating if a '1' needs to be appended to the beginning due to rounding.\\
+    \end{itemize}
+\end{description}
+\hrule
+
+\end{document}
