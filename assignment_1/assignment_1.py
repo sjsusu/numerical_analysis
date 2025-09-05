@@ -1,5 +1,5 @@
 import math
-from decimal import *
+from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 
 """
 MATH 5334 - Assignment 1: Binary Encoding
@@ -40,9 +40,9 @@ def decimal_to_binary(num_string):
     Raises
     ------
     TypeError
-        The input is not a decimal.
+        If the input is not a valid decimal number.
     ValueError
-        The input is too small or large for IEEE 754 64-bit conversion.
+        If the input is too large for IEEE 754 64-bit conversion, or if the Decimal object cannot represent the input with its default precision.
     """
 
     # Check if user input is a decimal number
@@ -57,7 +57,7 @@ def decimal_to_binary(num_string):
 
     # Check cases for different types of floats
     # 1) Infinity (+ or -)
-    if math.isinf(num):
+    if math.isinf(num) and ('inf' in num_string.lower()):
         exponent = "".join(["1" for i in range(11)])
         fraction = "".join(["0" for i in range(52)])
         return " ".join([sign, exponent, fraction])
@@ -75,30 +75,72 @@ def decimal_to_binary(num_string):
         return " ".join([sign, exponent, fraction])
 
     # Check Magnitude
-    # Too small
-    elif num_abs < Decimal('1e-308'):
-        raise ValueError("Input is too small, try again.")
+    # Too small --> denormalized
+    elif num_abs < Decimal('1.7976931348623157e-308'):
+        # raise ValueError("Decimal entered is subnormal and would be denormalized\nsign: (0 or 1)\nexponent: all zeros\nfraction: non-zero")
+        exponent = "".join(["0" for i in range(11)])
+        fraction = "(non-zero mantissa)"
+        print("(Decimal entered is subnormal and would be denormalized.)")
+        return " ".join([sign, exponent, fraction])
     # Too large
-    elif num_abs > Decimal('1e308'):
-        raise ValueError("Input is too large, try again.")
+    elif num_abs > Decimal('1.7976931348623157e308'):
+        raise ValueError("Magnitude of input is too large, try again.")
 
     # 4) General Case
     else:
         # Retrieve integer and fractional parts of number
-        integer = num_abs.quantize(Decimal("1"), rounding=ROUND_FLOOR)
+        try:
+            integer = num_abs.quantize(Decimal("1"), rounding=ROUND_FLOOR)
+        except Exception:
+            raise ValueError('Unable to determine integer portion of number with current decimal precision. Try entering a number with a smaller magnitude.')
+        
         fraction = num_abs - integer
 
+        integer_binary = []
+        fraction_binary = []
+        found_exponent = False
+        
         # Convert integer portion to binary
         integer_binary = integer_to_binary(float(integer))
-
+        
+        # Case for numbers with large magnitudes
+        # (fractional binary computation not needed)
+        length_int_binary = len(integer_binary)
+        
+        if length_int_binary == 53:
+            exponent = 52
+            found_exponent = True
+        elif length_int_binary >= 54:
+            exponent = length_int_binary - 1
+            found_exponent = True
+            
+            if length_int_binary > 54:
+                integer_binary = integer_binary[:54]
+                exponent += length_int_binary - 54
+            
+            # Rounding Check 
+            if integer_binary[53] == '1':
+                while integer_binary[53] == '1':
+                    integer_binary, prepend = round_up(integer_binary)
+                    
+                    if prepend:
+                        integer_binary.insert(0, '1')
+                        integer_binary.pop()
+                        exponent += 1
+                        
+                
         # Convert fraction to binary and update integer binary if rounded
-        fraction_binary, integer_binary = fraction_to_binary(fraction, integer_binary)
+        else:
+            fraction_binary, integer_binary = fraction_to_binary(fraction, integer_binary)
 
         # Find exponent
-        if len(integer_binary) != 0:
+        if len(integer_binary) != 0 and not found_exponent:
             exponent = len(integer_binary) - 1
-        else:
-            exponent = -1 * (fraction_binary.index("1") + 1)
+        elif not found_exponent:
+            try:
+                exponent = -1 * (fraction_binary.index("1") + 1)
+            except Exception:
+                raise ValueError("Unable to determine exponent with current decimal precision. Try entering a number with a larger magnitude.")
 
         # Find biased exponent and binary representation
         exponent_biased = exponent + 1023
@@ -226,9 +268,9 @@ def fraction_to_binary(fraction, integer_binary):
         fraction_binary.pop()
         fraction_binary, rounding_integer = round_up(fraction_binary)
         if rounding_integer:
-            integer_binary_rounded, appending_integer = round_up(integer_binary)
+            integer_binary_rounded, prepending_integer = round_up(integer_binary)
 
-            if appending_integer:
+            if prepending_integer:
                 integer_binary_rounded.insert(0, "1")
 
             integer_binary = integer_binary_rounded
@@ -299,7 +341,7 @@ if __name__ == "__main__":
 
     while True:
         print("Note: Enter q to quit.", sep="\n")
-        num = input("Enter a number(in decimal form): ")
+        num = input("Enter a decimal: ")
 
         # Quit condition
         if num.lower() == "q":
