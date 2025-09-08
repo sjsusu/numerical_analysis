@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1757103168.50294 "/Users/User/Repos/numerical_analysis/latex_template/template.tex" "template.pdf" "template" 1757103168.81302 0
-  "/Users/User/Repos/numerical_analysis/latex_template/template.tex" 1757103168.0854 1623 45a3fbd46784217e76edc480d275e9c2 ""
+["pdflatex"] 1757105862.6493 "/Users/User/Repos/numerical_analysis/latex_template/template.tex" "template.pdf" "template" 1757105862.95905 0
+  "/Users/User/Repos/numerical_analysis/latex_template/template.tex" 1757105862.37569 1653 2661bc87f0f408784b0151ef69b62210 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -42,8 +42,8 @@
   "/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1724354839.98207 5467645 128b85b7cde5f5edc5cb7f1dd7ff8736 ""
   "/usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1724354831 8221424 f9c31bb8d957a0c00b152c295bf263d2 ""
   "/usr/local/texlive/2024/texmf.cnf" 1710266656 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "template.aux" 1757103168.77623 32 044b7f8fc9779af7531264e0c5c84b6d "pdflatex"
-  "template.tex" 1757103168.0854 1623 45a3fbd46784217e76edc480d275e9c2 ""
+  "template.aux" 1757105862.92307 32 044b7f8fc9779af7531264e0c5c84b6d "pdflatex"
+  "template.tex" 1757105862.37569 1653 2661bc87f0f408784b0151ef69b62210 ""
   (generated)
   "template.aux"
   "template.log"

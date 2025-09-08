@@ -10,6 +10,7 @@
 \linespread{1.2} 
 
 \usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
 \pagestyle{fancy} 
 \lhead{Math 5334: \emph{Numerical Analysis}}
 \rhead{Serena Su}
@@ -56,14 +57,52 @@ The algorithm follows these general steps:
         \item Determine the sign bit (0 for positive, 1 for negative).
         \item Separate the number into its integer and fractional parts.
         \item Convert both parts to binary, rounding/appending to keep 53 significant bits for the mantissa (pre-normalization) as needed.
-        \item Find the exponent.
-        \item Calculate the biased exponent and its binary representation. Then prepending with leading zeros to ensure it is 11 bits long if needed.
+        \begin{enumerate}
+            \item Convert the integer part to binary.
+            \begin{enumerate}
+                \item Repeatedly divide the integer by 2, recording the remainders until the integer is < 1.
+                \item Remove trailing zeros from the list of remainders.
+                \item Return reversed list of remainders as binary representation.
+                
+                \emph{Note:} if integer part is 0, an empty list is returned.
+            \end{enumerate}
+            \item \textbf{If} integer part has at least than 53 bits, truncate and round to 53 bits. Also find the  exponent.
+            \begin{enumerate}
+                \item \textbf{If} integer binary length = 53, no rounding is needed. Set exponent = 52.
+                \item \textbf{Else} if integer binary length $\geq$ 54, set exponent = length - 1. Truncate to 54 bits and round the last bit. If a carry occurs, prepend '1' to the integer binary, remove the last bit, and increment the exponent by 1. Repeat rounding if necessary.
+            \end{enumerate}
+            \item \textbf{Else} convert the fractional part to binary until the total length (integer + fraction) is 53 significant bits, rounding if necessary.
+            \begin{enumerate}
+                \item Calculate the number of significant bits in the mantissa already used by the integer part.
+                \item Determine maximum number of significant bits remaining for the fractional part (54 - integer bits).
+                \item Repeatedly multiply the fractional part by 2, recording the integer part (0 or 1) until the fractional part meets tolerance or max significant bits are reached.
+                \item \textbf{If} the fractional part is not 0 after reaching max bits, round the binary representation. Rounding the integer part may be necessary if rounding the fractional part causes a carry. Repeat rounding until no carry is needed.
+                \item Return a tuple of the binary representation of the fraction, and the (possibly rounded) binary representation of the integer part.
+            \end{enumerate}
+        \end{enumerate}
+        \item \textbf{If} fractional binary representation is not empty, find the exponent.
+        \begin{enumerate}
+            \item \textbf{If} integer part is not empty, exponent = (length of integer binary) - 1.
+            \item Else exponent = - (index of first '1' in fractional binary + 1).
+        \end{enumerate}
+        \item Calculate the biased exponent and its binary representation. 
+        \begin{enumerate}
+            \item Biased exponent = exponent + 1023.
+            \item Convert biased exponent to binary using the same method as integer binary conversion.
+            \item \textbf{If} biased exponent binary is less than 11 bits, prepend with leading zeros.
+            
+            \emph{Note:} Biased exponent should not be more than 11 bits, as we have already checked if the magnitude of the number is within representable range.
+        \end{enumerate}
         \item Combine the integer and fractional binary parts to form the mantissa.
         \item Normalize the mantissa to 52 bits.
+        \begin{enumerate}
+            \item We already know there are 53 significant bits in total (integer + fraction) before normalization. The normalized mantissa is a splice that starts 1 index after the first '1' bit (the leading '1').
+        \end{enumerate}
         \item Combine the sign, exponent, and mantissa to form the final binary representation.
+        \item Return the final binary representation as a string formatted as "sign exponent mantissa".
     \end{enumerate}
 \end{enumerate}
-\textbf{Note:} Extra exception handling occurs in steps 4b and 4d to ensure that conversion is possible within the default precision (28 significant digits) of the Decimal object. Due to this limitation, the actual range of representable numbers in this program is roughly 1e-14 to 1e27.
+\textbf{Note:} Extra exception handling occurs in steps 4b and 4d(ii) to ensure that conversion is possible within the default precision (28 significant digits) of the Decimal object. Due to this limitation, the actual range of representable numbers in this program is roughly 1e-14 to 1e27.
 
 \section*{Function Documentation}
 \subsection*{Main Function\\} 
