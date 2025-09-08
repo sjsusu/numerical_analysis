@@ -76,92 +76,91 @@ def decimal_to_binary(num_string):
 
     # Check Magnitude
     # Too small --> denormalized
-    elif num_abs < Decimal('1.7976931348623157e-308'):
-        # raise ValueError("Decimal entered is subnormal and would be denormalized\nsign: (0 or 1)\nexponent: all zeros\nfraction: non-zero")
+    elif num_abs < Decimal('2.2251e-308'):
         exponent = "".join(["0" for i in range(11)])
         fraction = "(non-zero mantissa)"
         print("(Decimal entered is subnormal and would be denormalized.)")
         return " ".join([sign, exponent, fraction])
     # Too large
-    elif num_abs > Decimal('1.7976931348623157e308'):
+    elif num_abs > Decimal('1.7977e308'):
         raise ValueError("Magnitude of input is too large, try again.")
 
     # 4) General Case
-    else:
-        # Retrieve integer and fractional parts of number
-        try:
-            integer = num_abs.quantize(Decimal("1"), rounding=ROUND_FLOOR)
-        except Exception:
-            raise ValueError('Unable to determine integer portion of number with current decimal precision. Try entering a number with a smaller magnitude.')
-        
-        fraction = num_abs - integer
+    # Retrieve integer and fractional parts of number
+    try:
+        integer = num_abs.quantize(Decimal("1"), rounding=ROUND_FLOOR)
+    except Exception:
+        raise ValueError('Unable to determine integer portion of number with current decimal precision.\nTry entering a number with a smaller magnitude.')
+    
+    fraction = num_abs - integer
 
-        integer_binary = []
-        fraction_binary = []
-        found_exponent = False
+    integer_binary = []
+    fraction_binary = []
+    found_exponent = False
+    
+    # Convert integer portion to binary
+    integer_binary = integer_to_binary(float(integer))
+    
+    # Case for numbers with large magnitudes
+    # (fractional binary computation not needed)
+    length_int_binary = len(integer_binary)
+    
+    if length_int_binary == 53:
+        exponent = 52
+        found_exponent = True
+    elif length_int_binary >= 54:
+        exponent = length_int_binary - 1
+        found_exponent = True
         
-        # Convert integer portion to binary
-        integer_binary = integer_to_binary(float(integer))
+        if length_int_binary > 54:
+            integer_binary = integer_binary[:54]
         
-        # Case for numbers with large magnitudes
-        # (fractional binary computation not needed)
-        length_int_binary = len(integer_binary)
-        
-        if length_int_binary == 53:
-            exponent = 52
-            found_exponent = True
-        elif length_int_binary >= 54:
-            exponent = length_int_binary - 1
-            found_exponent = True
-            
-            if length_int_binary > 54:
-                integer_binary = integer_binary[:54]
-                exponent += length_int_binary - 54
-            
-            # Rounding Check 
-            if integer_binary[53] == '1':
-                while integer_binary[53] == '1':
-                    integer_binary, prepend = round_up(integer_binary)
-                    
-                    if prepend:
-                        integer_binary.insert(0, '1')
-                        integer_binary.pop()
-                        exponent += 1
-                        
+        # Rounding Check 
+        if integer_binary[53] == '1':
+            while integer_binary[53] == '1':
+                integer_binary, prepend = round_up(integer_binary)
                 
-        # Convert fraction to binary and update integer binary if rounded
-        else:
-            fraction_binary, integer_binary = fraction_to_binary(fraction, integer_binary)
+                if prepend:
+                    integer_binary.insert(0, '1')
+                    integer_binary.pop()
+                    exponent += 1
+        
+        # Make mantissa 53 bits
+        integer_binary.pop()
+        
+    # Convert fraction to binary and update integer binary if rounded
+    else:
+        fraction_binary, integer_binary = fraction_to_binary(fraction, integer_binary)
 
-        # Find exponent
-        if len(integer_binary) != 0 and not found_exponent:
-            exponent = len(integer_binary) - 1
-        elif not found_exponent:
-            try:
-                exponent = -1 * (fraction_binary.index("1") + 1)
-            except Exception:
-                raise ValueError("Unable to determine exponent with current decimal precision. Try entering a number with a larger magnitude.")
+    # Find exponent
+    if len(integer_binary) != 0 and not found_exponent:
+        exponent = len(integer_binary) - 1
+    elif not found_exponent:
+        try:
+            exponent = -1 * (fraction_binary.index("1") + 1)
+        except Exception:
+            raise ValueError("Unable to determine exponent with current decimal precision.\nTry entering a number with a larger magnitude.")
 
-        # Find biased exponent and binary representation
-        exponent_biased = exponent + 1023
-        exponent_binary = integer_to_binary(exponent_biased)
+    # Find biased exponent and binary representation
+    exponent_biased = exponent + 1023
+    exponent_binary = integer_to_binary(exponent_biased)
 
-        # Append extra zeros to exponent
-        if len(exponent_binary) != 11:
-            missing_bits = 11 - len(exponent_binary)
-            exponent_binary = ["0" for i in range(missing_bits)] + exponent_binary
+    # Prepend extra zeros to exponent
+    if len(exponent_binary) != 11:
+        missing_bits = 11 - len(exponent_binary)
+        exponent_binary = ["0" for i in range(missing_bits)] + exponent_binary
 
-        # Combine integer and fraction binary
-        integer_and_fraction_binary = integer_binary + fraction_binary
+    # Combine integer and fraction binary
+    integer_and_fraction_binary = integer_binary + fraction_binary
 
-        # Normalization
-        first_one = integer_and_fraction_binary.index("1")
-        mantissa = integer_and_fraction_binary[(first_one + 1) :]
+    # Normalization
+    first_one = integer_and_fraction_binary.index("1")
+    mantissa = integer_and_fraction_binary[(first_one + 1) :]
 
-        # Build final binary number
-        num_binary = [sign, " "] + exponent_binary + [" "] + mantissa
+    # Build final binary number
+    num_binary = [sign, " "] + exponent_binary + [" "] + mantissa
 
-        return "".join(num_binary)
+    return "".join(num_binary)
 
 
 # Helper functions
@@ -183,6 +182,8 @@ def integer_to_binary(integer):
     """
     dividend = integer
     integer_binary = []
+    
+    # Convert integer to binary
     while True:
         quotient = dividend / 2
         remainder = math.floor(dividend % 2)
@@ -265,17 +266,30 @@ def fraction_to_binary(fraction, integer_binary):
 
     # Rounding Case (last digit is 1)
     else:
-        fraction_binary.pop()
-        fraction_binary, rounding_integer = round_up(fraction_binary)
-        if rounding_integer:
+        rounding = True
+        integer_binary_rounded = integer_binary
+        
+        while rounding:
+            fraction_binary.pop()
+            fraction_binary, rounding_integer = round_up(fraction_binary)
+            
+            if not rounding_integer:
+                break
+            
             integer_binary_rounded, prepending_integer = round_up(integer_binary)
 
             if prepending_integer:
                 integer_binary_rounded.insert(0, "1")
-
-            integer_binary = integer_binary_rounded
-
-        return (fraction_binary, integer_binary)
+            else:
+                break
+            
+            if fraction_binary[len(fraction_binary)] == '0':
+                fraction_binary.pop()
+                break
+            
+            rounding_integer, prepending_integer = False, False
+            
+        return (fraction_binary, integer_binary_rounded)
 
 
 def round_up(binary):
