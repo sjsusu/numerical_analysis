@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1757350273.61486 "/Users/User/Repos/numerical_analysis/assignment_1/latex_1/assignment_1.tex" "assignment_1.pdf" "assignment_1" 1757350273.9383 0
-  "/Users/User/Repos/numerical_analysis/assignment_1/latex_1/assignment_1.tex" 1757350273.45369 9923 e504a20d6e91c06fda8694d796b4bff4 ""
+["pdflatex"] 1757453154.59423 "/Users/User/Repos/numerical_analysis/assignment_1/latex_1/assignment_1.tex" "assignment_1.pdf" "assignment_1" 1757453154.9292 0
+  "/Users/User/Repos/numerical_analysis/assignment_1/latex_1/assignment_1.tex" 1757453154.42912 10164 f4ed2940b10702bdb271a1391c446228 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -50,8 +50,8 @@
   "/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1724354839.98207 5467645 128b85b7cde5f5edc5cb7f1dd7ff8736 ""
   "/usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1724354831 8221424 f9c31bb8d957a0c00b152c295bf263d2 ""
   "/usr/local/texlive/2024/texmf.cnf" 1710266656 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "assignment_1.aux" 1757350273.89738 32 2d1df76398b3c48c6419a45a7331db2d "pdflatex"
-  "assignment_1.tex" 1757350273.45369 9923 e504a20d6e91c06fda8694d796b4bff4 ""
+  "assignment_1.aux" 1757453154.89082 32 2d1df76398b3c48c6419a45a7331db2d "pdflatex"
+  "assignment_1.tex" 1757453154.42912 10164 f4ed2940b10702bdb271a1391c446228 ""
   (generated)
   "assignment_1.aux"
   "assignment_1.log"

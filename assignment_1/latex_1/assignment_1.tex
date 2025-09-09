@@ -139,7 +139,7 @@ This function takes an integer and returns its binary representation as a list o
     \item \texttt{integer} : \texttt{(int} or \texttt{float)} The integer to be converted into binary.
 
     \item[Returns:] 
-    \item \texttt{list :} The binary representation of the integer as an ordered list. Each index contains a `0` or `1`.\\
+    \item \texttt{list of string:} The binary representation of the integer as an ordered list. Each index contains a `0` or `1`.\\
 \end{description}
 
 \hrule 
@@ -191,12 +191,18 @@ It returns a tuple containing:
 \begin{description}
     \item[Parameters:]
     \item \texttt{binary} : \texttt{(list of string)} The binary representation of a number as an ordered list of '0' and '1' chars.
+    
+    We assume that if the number is a(n):
+    \begin{itemize}
+        \item Integer: '1' to be rounded remains in the binary representation as the last digit.
+        \item Fraction: The last digit '1' to be rounded is already removed from binary representation.
+    \end{itemize}
 
     \item[Returns:]
     \item \texttt{tuple (list of string, bool) :}
     \begin{itemize}
-        \item \texttt{list of string:} The first element is the rounded binary number as a list of '0' and '1' chars.
-        \item \texttt{bool:} The second element is a boolean indicating if a '1' needs to be appended to the beginning due to rounding.\\
+        \item \texttt{list of string:} The rounded binary number as a list of '0' and '1' chars.
+        \item \texttt{bool:} Indicates if a '1' needs to be appended to the beginning due to rounding.\\
     \end{itemize}
 \end{description}
 \hrule
