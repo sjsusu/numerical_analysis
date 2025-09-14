@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.22)  10 SEP 2025 19:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.22)  14 SEP 2025 00:21
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/User/Repos/numerical_analysis/latex_template/template.tex
-(/Users/User/Repos/numerical_analysis/latex_template/template.tex
+**/Users/User/Repos/numerical_analysis/assignment_2/latex_2/assignment_2.tex
+(/Users/User/Repos/numerical_analysis/assignment_2/latex_2/assignment_2.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
 (/usr/local/texlive/2024/texmf-dist/tex/latex/base/article.cls
@@ -273,10 +273,7 @@ Package: iftex 2022/02/03 v1.0f TeX engine tests
 \Gm@layouthoffset=\dimen164
 \Gm@layoutvoffset=\dimen165
 \Gm@dimlist=\toks31
-)
-\c@question=\count286
-\c@subquest=\count287
- (/usr/local/texlive/2024/texmf-dist/tex/latex/parskip/parskip.sty
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/parskip/parskip.sty
 Package: parskip 2021-03-14 v2.0h non-zero parskip adjustments
  (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
@@ -286,8 +283,11 @@ Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 )) (/usr/local/texlive/2024/texmf-dist/tex/latex/etoolbox/etoolbox.sty
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count288
-)) (/usr/local/texlive/2024/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+\etb@tempcnta=\count286
+))
+\c@question=\count287
+\c@subquest=\count288
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@headwidth=\skip56
 \f@nch@O@elh=\skip57
@@ -302,8 +302,8 @@ Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count289
 \l__pdf_internal_box=\box55
-) (./template.aux)
-\openout1 = `template.aux'.
+) (./assignment_2.aux)
+\openout1 = `assignment_2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 45.
 LaTeX Font Info:    ... okay on input line 45.
@@ -378,30 +378,42 @@ LaTeX Font Info:    Font shape `T1/cmbr/b/n' in size <12> not available
 LaTeX Font Info:    Font shape `T1/cmbr/b/n' in size <24.88> not available
 (Font)              Font shape `T1/cmbr/bx/n' tried instead on input line 48.
 LaTeX Font Info:    Font shape `T1/cmbr/m/it' in size <14.4> not available
-(Font)              Font shape `T1/cmbr/m/sl' tried instead on input line 52.
+(Font)              Font shape `T1/cmbr/m/sl' tried instead on input line 50.
+LaTeX Font Info:    Font shape `T1/cmbr/b/n' in size <17.28> not available
+(Font)              Font shape `T1/cmbr/bx/n' tried instead on input line 55.
+LaTeX Font Info:    Trying to load font information for OML+cmbrm on input line 56.
+(/usr/local/texlive/2024/texmf-dist/tex/latex/cmbright/omlcmbrm.fd
+File: omlcmbrm.fd 2005/04/13 v8.1 (WaS)
+)
+LaTeX Font Info:    Trying to load font information for OMS+cmbrs on input line 56.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/cmbright/omscmbrs.fd
+File: omscmbrs.fd 2005/04/13 v8.1 (WaS)
+)
+LaTeX Font Info:    Font shape `T1/cmbr/b/n' in size <14.4> not available
+(Font)              Font shape `T1/cmbr/bx/n' tried instead on input line 60.
 LaTeX Font Info:    Font shape `T1/cmbr/m/it' in size <12> not available
-(Font)              Font shape `T1/cmbr/m/sl' tried instead on input line 120.
-[1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}
+(Font)              Font shape `T1/cmbr/m/sl' tried instead on input line 65.
+ [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}
 
-] (./template.aux)
+] [2] (./assignment_2.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 5813 strings out of 474116
- 84644 string characters out of 5743682
- 1927187 words of memory out of 5000000
- 28120 multiletter control sequences out of 15000+600000
- 564055 words of font info for 45 fonts, out of 8000000 for 9000
+ 5870 strings out of 474116
+ 85734 string characters out of 5743682
+ 1937187 words of memory out of 5000000
+ 28160 multiletter control sequences out of 15000+600000
+ 569866 words of font info for 64 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,11n,65p,569b,277s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbmo10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
-Output written on template.pdf (1 page, 27694 bytes).
+ 57i,11n,65p,579b,271s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/hfbright/hfbr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/hfbright/hfbr8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/hfbright/hfbrmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/hfbright/hfbrmi8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/hfbright/hfbrsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/hfbright/hfbrsy8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbmo10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
+Output written on assignment_2.pdf (2 pages, 96395 bytes).
 PDF statistics:
- 29 PDF objects out of 1000 (max. 8388607)
- 17 compressed objects within 1 object stream
+ 67 PDF objects out of 1000 (max. 8388607)
+ 40 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,10 +1,36 @@
 \documentclass[12pt]{article}
 
+\usepackage{listings}
+\usepackage{graphicx}
+
+\usepackage{amssymb} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{sansmath}
+\usepackage{epsfig}
+
 \usepackage{cmbright}
 \usepackage[T1]{fontenc}
 \renewcommand*\familydefault{\sfdefault}
 
-\usepackage[margin=2cm]{geometry} %This command widens the margins
+\usepackage[margin=2cm]{geometry} 
+
+\newcounter{question}
+\setcounter{question}{0}
+\newcounter{subquest}
+
+\newcommand{\question}[1]{
+    \stepcounter{question} 
+    \vspace{1em}
+    \textbf{\Large Question \thequestion \ - #1}
+    \vspace{.5em} 
+    \setcounter{subquest}{0}\ \\}
+
+\newcommand{\subquestion}{
+    \stepcounter{subquest} 
+    \vspace{.5em}
+    \textbf{\large Question \thequestion.\thesubquest}
+    \vspace{.25em}\ \\}
 
 \usepackage[parfill]{parskip}
 \linespread{1.2} 
@@ -19,76 +45,76 @@
 \begin{document}
 
 \begin{center}
-\textbf{\huge Assignment X: XXX}
+\textbf{\huge Assignment X}
 
-{\Large{Coding Documentation}}
+% {\Large{Coding Documentation}}
 
 {\large\emph{Due Date: XXXX}}
 \vspace{1em}
 \end{center}
 \hrule
 
-\section*{Introduction}
+% For Code Documentation
+% \section*{Introduction}
 
-lorem ipsum.
+% lorem ipsum.
 
-\section*{Cases Handled}
-The following cases are considered:
-\begin{itemize}
-    \item Case 1
-    \item Case 2
-\end{itemize}
+% \section*{Cases Handled}
+% The following cases are considered:
+% \begin{itemize}
+%     \item Case 1
+%     \item Case 2
+% \end{itemize}
 
-\section*{Algorithm}
-The algorithm follows these general steps:
-\begin{enumerate}
-    \item Case 1
-    \begin{enumerate}
-        \item Subcase A
-    \end{enumerate}
-\end{enumerate}
+% \section*{Algorithm}
+% The algorithm follows these general steps:
+% \begin{enumerate}
+%     \item Case 1
+%     \begin{enumerate}
+%         \item Subcase A
+%     \end{enumerate}
+% \end{enumerate}
 
-\section*{Function Documentation}
-\subsection*{Main Function\\} 
-\hrule
-{\large\texttt{function(param)}}
+% \section*{Function Documentation}
+% \subsection*{Main Function\\} 
+% \hrule
+% {\large\texttt{function(param)}}
 
-\textbf{Description:}
+% \textbf{Description:}
 
-lorem ipsum.
+% lorem ipsum.
 
-\begin{description}
-    \item[Parameters:] 
-    \item \texttt{param} : \texttt{(type)} lorem ipsum.
+% \begin{description}
+%     \item[Parameters:] 
+%     \item \texttt{param} : \texttt{(type)} lorem ipsum.
 
-    \item[Returns:] 
-    \item \texttt{type :} lorem ipsum.
+%     \item[Returns:] 
+%     \item \texttt{type :} lorem ipsum.
 
-    \item[Raises:] 
-    \item \texttt{Error:} lorem ipsum. \\
-\end{description}
+%     \item[Raises:] 
+%     \item \texttt{Error:} lorem ipsum. \\
+% \end{description}
 
-\hrule
+% \hrule
 
-\subsection*{Helper Functions\\}
-\hrule
-{\large\texttt{function(param)}}
+% \subsection*{Helper Functions\\}
+% \hrule
+% {\large\texttt{function(param)}}
 
-\textbf{Description:}
+% \textbf{Description:}
 
-lorem ipsum.
+% lorem ipsum.
 
-\begin{description}
-    \item[Parameters:] 
-    \item \texttt{param} : \texttt{(type)} lorem ipsum.
+% \begin{description}
+%     \item[Parameters:] 
+%     \item \texttt{param} : \texttt{(type)} lorem ipsum.
 
-    \item[Returns:] 
-    \item \texttt{type :} lorem ipsum.
+%     \item[Returns:] 
+%     \item \texttt{type :} lorem ipsum.
 
-    \item[Raises:] 
-    \item \texttt{Error:} lorem ipsum. \\
-\end{description}
-
-\hrule
+%     \item[Raises:] 
+%     \item \texttt{Error:} lorem ipsum. \\
+% \end{description}
+% \hrule
 
 \end{document}

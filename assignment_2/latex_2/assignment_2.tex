@@ -1,0 +1,86 @@
+\documentclass[12pt]{article}
+
+\usepackage{listings}
+\usepackage{graphicx}
+
+\usepackage{amssymb} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{sansmath}
+\usepackage{epsfig}
+
+\usepackage{cmbright}
+\usepackage[T1]{fontenc}
+\renewcommand*\familydefault{\sfdefault}
+
+\usepackage[margin=2cm]{geometry}
+
+\usepackage[parfill]{parskip}
+\linespread{1.2} 
+
+\newcounter{question}
+\setcounter{question}{0}
+\newcounter{subquest}
+
+\newcommand{\question}[1]{
+    \stepcounter{question} 
+    \vspace{1em}
+    \textbf{\Large Question \thequestion \ - #1}
+    \vspace{.5em} 
+    \setcounter{subquest}{0}\ \\}
+
+\newcommand{\subquestion}{
+    \stepcounter{subquest} 
+    \vspace{.5em}
+    \textbf{\large Question \thequestion.\thesubquest}
+    \vspace{.25em}\ \\}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy} 
+\lhead{Math 5334: \emph{Numerical Analysis}}
+\rhead{Serena Su}
+
+
+\begin{document}
+
+\begin{center}
+\textbf{\huge Assignment 2}
+
+{\large\emph{Due Date: September 22, 2025}}
+\vspace{1em}
+\end{center}
+\hrule
+
+\question{Lagrange Interpolation and Error Analysis}
+Let $f \in C^{n+1}[a,\,b]$, and let $P_n$ be its Lagrange interpolating polynomial at the distinct nodes $x_0, x_1, \dots, x_n \in [a,\,b]$. The interpolation error is: 
+\[R_n(x) = f(x) - P_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!} \prod_{i=0}^{n}(x - x_i),\quad \xi \in (a,\,b)\]
+Suppose $f(x) = e^x$ on the interval $[0,\,1]$, for equally spaced nodes $x_i = \frac{i}{n}$.
+
+\subquestion
+Derive an explicit bound for the maximum error $\max_{x \in [0,1]} |R_n(x)|$.
+
+
+\begin{proof}
+    To bound $|R_n(x)|$, we start with the error formula:
+    \[|R_n(x)| = \left|\frac{f^{(n+1)}(\xi)}{(n+1)!} \prod_{i=0}^{n}(x - x_i)\right|, \quad \xi \in (0,1)\]
+    
+    Note $\frac{1}{(n-1)!}$ is a constant. We can bound $R_n(x)$ by bounding $f^{(n+1)}(\xi)$ and $\left|\prod_{i=0}^{n}(x - x_i)\right|$ separately.
+    
+    Now notice that $f^{(n+1)}(x) = e^x$ for all $n$. Since $e^x$ is strictly increasing on $[0,1]$, we have that \[f^{(n+1)}(\xi) = \max_{x \in [0,1]} |f^{(n+1)}(x)| = f(1) = e \label{f}\tag{1}\]
+
+    Next, we need to bound $\left|\prod_{i=0}^{n}(x - x_i)\right|$. Let $\omega_{n}(x) = \prod_{i=0}^{n}(x - x_i)$. Note that $\omega_{n}(x)$ is a polynomial of degree $n+1$. Since $\omega_{n}(x)$ is continuous on the compact interval $[0,1]$, it attains its maximum at some point in $[0,1]$. We may write that: 
+    \[|\omega_{n}(x)| \leq W_n \label{h}\tag{2}\]
+    Where $W_n = \max_{x \in [0,1]} |\omega_{n}(x)| = |\omega_{n}(x^*)|$ for some $x^* \in [0,1]$.
+
+    Now, we can use \eqref{f} and \eqref{h} to bound $|R_n(x)|$ from above:
+    \[|R_n(x)| \leq \frac{e}{(n+1)!} W_n\]
+    Since $R_n(x)$ is continuous on the compact interval $[0,1]$, $\sup_{x\in[0,1]} R_n(x) = \max_{x\in[0,1]} R_n(x)$. \\ Since the supremum is the least upper bound, we have that:
+    \[\max_{x \in [0,1]} |R_n(x)| \leq \frac{e}{(n+1)!} W_n\]
+    Which gives us an explicit bound for the remainder.
+\end{proof}
+
+\subquestion
+Show the asymptotic decay of this error as $n \to \infty$.
+
+\end{document}
