@@ -2,6 +2,7 @@
 
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{float}
 
 \usepackage{amssymb} 
 \usepackage{amsmath}
@@ -9,11 +10,39 @@
 \usepackage{sansmath}
 \usepackage{epsfig}
 
-\usepackage{cmbright}
 \usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \renewcommand*\familydefault{\sfdefault}
 
-\usepackage[margin=2cm]{geometry} 
+\usepackage[margin=2cm]{geometry}
+
+\usepackage[parfill]{parskip}
+\linespread{1.2} 
+
+\usepackage{xcolor}
+
+\lstdefinestyle{code}{  
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{teal},
+    ndkeywordstyle=\color{purple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=t,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=8pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single,
+    breaklines=true
+}
+
+\lstset{style=code}
 
 \newcounter{question}
 \setcounter{question}{0}
@@ -22,7 +51,7 @@
 \newcommand{\question}[1]{
     \stepcounter{question} 
     \vspace{1em}
-    \textbf{\Large Question \thequestion \ - #1}
+    \textbf{\Large\thequestion \ - #1}
     \vspace{.5em} 
     \setcounter{subquest}{0}\ \\}
 
@@ -32,15 +61,17 @@
     \textbf{\large Question \thequestion.\thesubquest}
     \vspace{.25em}\ \\}
 
-\usepackage[parfill]{parskip}
-\linespread{1.2} 
+\newcommand{\solution}
+    {\par\vspace{0.5em}\noindent\emph{Solution.}\ }
+    {\par\vspace{1em}}
 
 \usepackage{fancyhdr}
 \setlength{\headheight}{15pt}
 \pagestyle{fancy} 
 \lhead{Math 5334: \emph{Numerical Analysis}}
 \rhead{Serena Su}
-
+\cfoot{}
+\rfoot{\thepage}
 
 \begin{document}
 
