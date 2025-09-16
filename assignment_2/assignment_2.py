@@ -119,7 +119,7 @@ if __name__ == "__main__":
     #     generate_equation(nodes_deg_20, 20),
     # ]
     
-    # with open("/Users/User/Repos/numerical_analysis/assignment_2/plots_2/q2_2/lagrange_equations.txt", "w") as f:
+    # with open("./plots_2/q2_2/lagrange_equations.txt", "w") as f:
     #     for eq in equations:
     #         f.write(eq + "\n")
 
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     #     generate_equation(nodes_deg_20, 20),
     # ]
     
-    # with open("/Users/User/Repos/numerical_analysis/assignment_2/plots_2/q2_3/lagrange_equations_chebyshev.txt", "w") as f:
+    # with open("./plots_2/q2_3/lagrange_equations_chebyshev.txt", "w") as f:
     #     for eq in equations:
     #         f.write(eq + "\n")
 
