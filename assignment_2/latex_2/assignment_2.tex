@@ -170,45 +170,56 @@ def lagrange_coefficients(nodes):
     a = np.array([dd_table[i, 0] for i in range(dd_table.shape[0])])
     return a
 
-def generate_equation(nodes, degree):
+def generate_lagrange(nodes, degree):
     # Get coefficients
     a = lagrange_coefficients(nodes)
-    # Build equation string
-    equation = f"$P_{degree}(x) = {a[0]}"
+    # Start with function and constant term
+    equation = f"P_{{{degree}}}(x) = {a[0]}"
+    w = []
     # Build (x - xi) terms
-    w = [(f"(x - {xi})") for xi in nodes]
-    # Temporary string to hold (x - xi) terms
+    for xi in nodes:
+        if abs(xi) <= 1e-14:
+            w.append(f'({xi})')
+        elif xi < 0:
+            w.append(f"(x + {abs(xi)})")
+        else:
+            w.append(f"(x - {xi})")
     b = ""
 
+    # Build polynomial string
     for i in range(1, len(a)):
         for j in range(i):
+            # Multiply (x - xi) terms
             b += w[j]
-        # Append the (x - xi) product term for the current coefficient
-        equation += f" + {a[i]}*{b}"
+        # Multiply (x - xi) product with current coefficient and add term
+        if a[i] >= 0:
+            equation += f" + {a[i]}{b}"
+        else:
+            equation += f" - {abs(a[i])}{b}"
         b = ""
 
-    return equation + "$"
+    return equation
 
 # Sample Execution
 if __name__ == "__main__":
     # Generate 6 nodes for 5th degree polynomial
     nodes = np.linspace(-1, 1, 6)
     equation = generate_equation(nodes, 5)
-    with open("./plots_2/q2_2/lagrange_equations.txt", "w") as f:
-        f.write(equation + "\n")
+    with open("./plots_2/q2_2/lagrange_equations.txt", "w") as file:
+        file.write(equation + "\n")
 
 \end{lstlisting}
 
 The interpolation polynomial $P_5(x)$ at equidistant nodes for $n=5$ is given by:
 \begin{align*}
-    P_5(x) =\ & 0.047619047619047616 \\
-    &+ 0.18583042973286878*(x - -1.0) \\
-    &+ 1.1227255129694158*(x - -1.0)(x - -0.6) \\
-    &- 2.0647825525874324*(x - -1.0)(x - -0.6)(x - -0.19999999999999996) \\
-    &+ 1.2904890953671473*(x - -1.0)(x - -0.6)(x - -0.19999999999999996)\\
-    &(x - 0.20000000000000018) \\
-    &- 3.552713678800501e-15*(x - -1.0)(x - -0.6)(x - -0.19999999999999996)\\
-    &(x - 0.20000000000000018)(x - 0.6000000000000001)
+    P_{5}(x) = \ & 0.047619047619047616 \\
+        &+ 0.18583042973286878(x + 1.0) \\
+        &+ 1.1227255129694158(x + 1.0)(x + 0.6) \\
+        &- 2.0647825525874324(x + 1.0)(x + 0.6)(x + 0.19999999999999996) \\
+        &+ 1.2904890953671473(x + 1.0)(x + 0.6)(x + 0.19999999999999996)\\
+        &(x - 0.20000000000000018) \\
+        &- 3.552713678800501e-15(x + 1.0)(x + 0.6)(x + 0.19999999999999996)\\
+        &(x - 0.20000000000000018)(x - 0.6000000000000001)
 \end{align*}
 
 \newpage
@@ -328,11 +339,93 @@ Prove that the numbers
 \[x_k = \cos\left(\frac{2k-1}{2n} \pi\right), \quad k=1,2,\dots,n\]
 are the roots of $T_n(x)$.
 
+\begin{proof}
+    We want to find the values of $x$ such that $T_n(x) = 0$. By the definition of Chebyshev polynomials, we have:
+    \[T_n(x) = \cos(n \arccos x)\]
+    Setting $T_n(x) = 0$, we get:
+    \[T_n(x) = \cos(n \arccos x) = 0\]
+    The cosine function is zero at odd multiples of $\frac{\pi}{2}$.
+    So $T_n(x)$ can only equal zero when $n \arccos x$ is an odd multiple of $\frac{\pi}{2}$. Therefore, we can write:
+    \[n \arccos x = \frac{(2k-1)\pi}{2}, \quad k \in \mathbb{Z}\]
+    Note that for $n=0$, $T_0(x) = \cos(0\cdot \arccos(x))=1$ which has no roots. So consider $n \geq 1$. Dividing both sides by $n$, we have:
+    \[\arccos x = \frac{(2k-1)\pi}{2n}, \quad k \in \mathbb{Z}\]
+    Taking the cosine of both sides, we get:
+    \[x = \cos\left(\frac{(2k-1)\pi}{2n}\right), \quad k \in \mathbb{Z}\]
+    Therefore, the set of x defined above are the roots of $T_n(x)$ for $n\geq 1$. Note that if we restrict $k$ to the integers $1, 2, \dots, n$, we exactly get that:
+    \[x_k = \cos\left(\frac{2k-1}{2n} \pi\right), \quad k=1,2,\dots,n\]
+    are the roots of $T_n(x)$.
+\end{proof}
+
+\newpage
 \subquestion
 Show that these roots are distinct and lie in the interval $(-1,1)$.
 
+\begin{proof}
+    To show that these roots are distinct, we need to show that for $k_1 \neq k_2$, we have $x_{k_1} \neq x_{k_2}$. Assume $k_1, k_2 \in \{1, 2, \dots, n\}$ such that $k_1 \neq k_2$ and $k_1 < k_2$. Then, assuming for fixed $n\geq 1$:
+    \[x_{k_1} = \cos\left(\frac{2k_1-1}{2n} \pi\right), \quad 
+    x_{k_2} = \cos\left(\frac{2k_2-1}{2n} \pi\right)\]
+    Note that $\frac{2k_1-1}{2n} \pi$ and $\frac{2k_2-1}{2n} \pi$ are distinct angles in the interval $(0, \pi)$.
+    Since the cosine function is strictly decreasing on the interval    $[0, \pi]$, and since $\frac{2k_1-1}{2n} \pi < \frac{2k_2-1}{2n} \pi$ are distinct, we have:
+    \[x_{k_1} = \cos\left(\frac{2k_1-1}{2n} \pi\right) > \cos\left(\frac{2k_2-1}{2n} \pi\right) = x_{k_2}\]
+    By the law of trichotomy, $x_{k_1} \neq x_{k_2}$. Therefore, the roots $x_k$ are distinct for $k=1, 2, \dots, n$.
+
+    Next, we need to show that these roots lie in the interval $(-1,1)$. Note that from above, we have shown that ${x_k}$ is a strictly decreasing sequence. Therefore, we only need to show that the largest root $x_1$ is less than $1$ and the smallest root $x_n$ is greater than $-1$.
+
+    First, let us show that $x_1 < 1$:
+    \[x_1 = \cos\left(\frac{2(1)-1}{2n} \pi\right) = \cos\left(\frac{\pi}{2n}\right)\]
+    Note that $\frac{\pi}{2n} \in (0, \frac{\pi}{2}]$. In this interval, the range of the cosine function is $[0,1)$. Therefore, we have:
+    \[x_1 = \cos\left(\frac{\pi}{2n}\right) < 1 \label{x1}\tag{1}\]   
+    Next, let us show that $x_n > -1$:
+    \[x_n = \cos\left(\frac{2n-1}{2n} \pi\right) = \cos\left(\pi - \frac{\pi}{2n}\right)\]
+    Note that $\pi - \frac{\pi}{2n} \in [\frac{\pi}{2}, \pi)$. In this interval, the range of the cosine function is $(-1, 0]$. Therefore, we have:
+    \[x_n = \cos\left(\pi - \frac{\pi}{2n}\right) > -1 \label{xn}\tag{2}\]
+    Combining \eqref{x1} and \eqref{xn}, we have shown that:
+    \[-1 < x_n < x_k < x_1 < 1\]
+    Therefore, $x_k$ are distinct roots that lie in the interval $(-1,1)$ for $k=1, 2, \dots, n$.
+\end{proof}
+
+\newpage
 \subquestion
 Write your own code to generate $T_n(x)$ using the recursion formula.
+
+\solution The following code was used to generate the Chebyshev polynomials::
+\begin{lstlisting}[language=Python, caption=3.3 Python]
+import sympy as smp
+
+def chebyshev_poly(n):
+    # Base Cases
+    if n == 0:
+        return 1
+    elif n == 1:
+        return smp.symbols("x")
+    # Recursive Case
+    else:
+        return 2 * smp.symbols('x') * chebyshev_poly(n - 1) - chebyshev_poly(n - 2)
+
+def generate_chebyshev(n):
+    x = smp.symbols('x')
+    poly = smp.expand(chebyshev_poly(n))
+    function = f"T_{{{n}}}({x})"
+    equation = function + " = " + smp.latex(poly) 
+    return equation
+
+# Sample Execution
+if __name__ == "__main__":
+with open("./plots_2/q3_3/chebyshev_polynomials.txt", "w") as file:
+    for n in range(6):
+        equation = generate_chebyshev(n)
+        file.write(equation + "\n")
+\end{lstlisting}
+
+The Chebyshev polynomials $T_n(x)$ for $n=0, 1, \dots, 5$ are given by:
+\begin{align*}
+    T_{0}(x) &= 1 \\
+    T_{1}(x) &= x \\
+    T_{2}(x) &= 2 x^{2} - 1 \\
+    T_{3}(x) &= 4 x^{3} - 3 x \\
+    T_{4}(x) &= 8 x^{4} - 8 x^{2} + 1 \\
+    T_{5}(x) &= 16 x^{5 }- 20 x^{3} + 5 x \\
+\end{align*}
 
 \newpage
 \question{Lagrange Interpolation for Nonsmooth Function}
