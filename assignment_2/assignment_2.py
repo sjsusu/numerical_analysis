@@ -2,40 +2,49 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 import sympy as smp
-from figures import Figure
 
 
 def f(x):
     return 1 / (1 + 20 * x**2)
 
 
-def lagrange_coefficients(nodes):
+def lagrange_coefficients(nodes, function=f):
     x = nodes
     num_nodes = len(nodes)
-    dd_table = np.array([[f(xi) for xi in nodes]])
+    # Add zeroth divided differences
+    dd_table = np.array([[function(xi) for xi in nodes]])
 
+    # Calculate divided difference table
     for i in range(1, num_nodes):
         ith_dd = np.zeros(num_nodes)
 
         for j in range(num_nodes - i):
+            # Calculate ith divided differences
             ith_dd[j] = (dd_table[i - 1, j + 1] - dd_table[i - 1, j]) / (
                 x[j + i] - x[j]
             )
 
+        # Append the ith divided difference row to the table
         dd_table = np.vstack([dd_table, ith_dd])
 
+    # Extract coefficients (first column of the table)
     a = np.array([dd_table[i, 0] for i in range(dd_table.shape[0])])
     return a
 
 
 def calculate_lagrange(nodes, a, x):
+    # Start with constant term
     y = a[0]
+    # Build (x - xi) terms
     w = [(x - xi) for xi in nodes]
+    # Temporary variable to hold (x - xi) product
     b = 1
 
     for i in range(1, len(a)):
         for j in range(i):
+            # Multiply (x - xi) terms
             b *= w[j]
+        # Multiply (x - xi) product with current coefficient
         y += a[i] * b
         b = 1
 
@@ -43,21 +52,27 @@ def calculate_lagrange(nodes, a, x):
 
 
 def generate_lagrange(nodes, degree):
+    # Get coefficients
     a = lagrange_coefficients(nodes)
+    # Start with function and constant term
     equation = f"P_{{{degree}}}(x) = {a[0]}"
     w = []
+    # Build (x - xi) terms
     for xi in nodes:
         if abs(xi) <= 1e-14:
-            w.append(f"({xi})")
+            w.append('(x)')
         elif xi < 0:
             w.append(f"(x + {abs(xi)})")
         else:
             w.append(f"(x - {xi})")
     b = ""
 
+    # Build polynomial string
     for i in range(1, len(a)):
         for j in range(i):
+            # Multiply (x - xi) terms
             b += w[j]
+        # Multiply (x - xi) product with current coefficient and add term
         if a[i] >= 0:
             equation += f" + {a[i]}{b}"
         else:
@@ -67,10 +82,13 @@ def generate_lagrange(nodes, degree):
     return equation
 
 
-def calculate_lagrange_output(nodes, x_coords=[]):
-    a = lagrange_coefficients(nodes)
+def calculate_lagrange_output(nodes, x_coords=[], function=f):
+    # Get coefficients
+    a = lagrange_coefficients(nodes, function)
+    # If no x_coords provided, use nodes as x_coords
     if len(x_coords) == 0:
         x_coords = nodes
+    # Calculate y coordinates for each x coordinate
     y_coordinates = np.array([calculate_lagrange(nodes, a, x) for x in x_coords])
 
     return y_coordinates
@@ -100,110 +118,231 @@ def generate_chebyshev(n):
     poly = smp.expand(chebyshev_poly(n))
     function = f"T_{{{n}}}({x})"
     equation = function + " = " + smp.latex(poly)
-    return equation
+    return equation, poly
 
 
+# Main Method
 if __name__ == "__main__":
-    # Question 2
-    title = "Equidistant Lagrange Interpolation"
-    x = np.linspace(-1, 1, 100)
-    y = f(x)
-    fig_f = Figure(x, y, r"$f(x)$")
+    # Enable Latex and Styling
+    plt.rcParams["text.usetex"] = True
+    plt.rcParams["axes.grid"] = True
+    plt.rc("grid", color="#a6a6a6", linestyle="dotted", linewidth=0.5)
+    plt.style.use("seaborn-v0_8-deep")
+    # Get list of default colors for style
+    prop_cycle = plt.rcParams["axes.prop_cycle"]
+    default_colors = prop_cycle.by_key()["color"]
 
+    # Question 2
+    # -----------------------------------------------------------
+    # Question 2.1 (Find P5(x) Equation)
+    # -----------------------------------------------------------
+    # Generate and save equation to a text file
+    nodes = np.linspace(-1, 1, 6)
+    equation = generate_lagrange(nodes, 5)
+    with open("./plots_2/q2_1/p5.txt", "w") as file:
+            file.write(equation)
+            
+    # -----------------------------------------------------------
     # Question 2.2 (Equidistant Nodes)
     # -----------------------------------------------------------
-    nodes_deg_5 = np.linspace(-1, 1, 6)
-    y_nodes_5 = calculate_lagrange_output(nodes_deg_5)
-    y_poly_5 = calculate_lagrange_output(nodes_deg_5, x)
-    f1 = Figure(x, y_poly_5, r"$P_5(x)$", 1)
-    f2 = Figure(nodes_deg_5, y_nodes_5, "", 1, ".", "")
+    title = "Equidistant Lagrange Interpolation"
+    x_coords = np.linspace(-1, 1, 100)
+    y_coords = f(x_coords)
+    n = [5, 10, 20]
 
-    nodes_deg_10 = np.linspace(-1, 1, 11)
-    y_nodes_10 = calculate_lagrange_output(nodes_deg_10)
-    y_poly_10 = calculate_lagrange_output(nodes_deg_10, x)
-    f3 = Figure(x, y_poly_10, r"$P_{10}(x)$", 2)
-    f4 = Figure(nodes_deg_10, y_nodes_10, "", 2, ".", "")
+    for i in range(len(n) + 1):
+        fig, ax = plt.subplots()
+        ax.plot(x_coords, y_coords, label=r"$f(x)$")
 
-    nodes_deg_20 = np.linspace(-1, 1, 21)
-    y_nodes_20 = calculate_lagrange_output(nodes_deg_20)
-    y_poly_20 = calculate_lagrange_output(nodes_deg_20, x)
-    f5 = Figure(x, y_poly_20, r"$P_{20}(x)$", 3)
-    f6 = Figure(nodes_deg_20, y_nodes_20, "", 3, ".", "")
+        # Plot f(x), P(x), and nodes
+        if i <= len(n) - 1:
+            x_nodes = np.linspace(-1, 1, n[i] + 1)
+            y_nodes = calculate_lagrange_output(x_nodes)
+            y_poly = calculate_lagrange_output(x_nodes, x_coords)
+            ax.plot(
+                x_coords,
+                y_poly,
+                label=rf"$P_{{{n[i]}}}(x)$",
+                color=default_colors[i + 1],
+            )
+            ax.scatter(x_nodes, y_nodes, color=default_colors[i + 1])
+            ax.set_title(title + f" (n = {n[i]})")
+            path = f"./plots_2/q2_2/p{n[i]}.png"
 
-    # Merge and plot figures
-    fig1 = fig_f.copy().merge([f1, f2], title + " (n = 5)")
-    fig2 = fig_f.copy().merge([f3, f4], title + " (n = 10)")
-    fig3 = fig_f.copy().merge([f5, f6], title + " (n = 20)")
-    fig4 = fig_f.copy().merge([f1, f3, f5])
-    fig1.get_figure("./plots_2/q2_2/p5.png")
-    fig2.get_figure("./plots_2/q2_2/p10.png")
-    fig3.get_figure("./plots_2/q2_2/p20.png")
-    fig4.get_figure("./plots_2/q2_2/all.png")
+        # Plot f(x) with all P(x)
+        else:
+            for j in range(len(n)):
+                x_nodes = np.linspace(-1, 1, n[j] + 1)
+                y_nodes = calculate_lagrange_output(x_nodes)
+                y_poly = calculate_lagrange_output(x_nodes, x_coords)
+                ax.plot(
+                    x_coords,
+                    y_poly,
+                    label=rf"$P_{{{n[j]}}}(x)$",
+                    color=default_colors[j + 1],
+                )
+                ax.set_title(title)
+                path = "./plots_2/q2_2/all.png"
 
-    # Generate and save equations to a text file
-    equations = [
-        generate_lagrange(nodes_deg_5, 5),
-        generate_lagrange(nodes_deg_10, 10),
-        generate_lagrange(nodes_deg_20, 20),
-    ]
+        # Configure axis and save figure
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.legend()
+        fig.savefig(path, dpi=300)
+        plt.show()
+        ax.cla()
 
-    with open("./plots_2/q2_2/lagrange_equations.txt", "w") as file:
-        for eq in equations:
-            file.write(eq + "\n")
-
-    plt.show()
     # -----------------------------------------------------------
-
     # Question 2.3 (Chebyshev Nodes)
     # -----------------------------------------------------------
     title = "Chebyshev Lagrange Interpolation"
+    x_coords = np.linspace(-1, 1, 100)
+    y_coords = f(x_coords)
+    n = [5, 10, 20]
 
-    nodes_deg_5 = chebyshev_nodes(6)
-    y_nodes_5 = calculate_lagrange_output(nodes_deg_5)
-    y_poly_5 = calculate_lagrange_output(nodes_deg_5, x)
-    f1 = Figure(x, y_poly_5, r"$P_5(x)$", 1)
-    f2 = Figure(nodes_deg_5, y_nodes_5, "", 1, ".", "")
+    for i in range(len(n) + 1):
+        fig, ax = plt.subplots()
+        ax.plot(x_coords, y_coords, label=r"$f(x)$")
 
-    nodes_deg_10 = chebyshev_nodes(11)
-    y_nodes_10 = calculate_lagrange_output(nodes_deg_10)
-    y_poly_10 = calculate_lagrange_output(nodes_deg_10, x)
-    f3 = Figure(x, y_poly_10, r"$P_{10}(x)$", 2)
-    f4 = Figure(nodes_deg_10, y_nodes_10, "", 2, ".", "")
+        # Plot f(x), P(x), and nodes
+        if i <= len(n) - 1:
+            x_nodes = chebyshev_nodes(n[i] + 1)
+            y_nodes = calculate_lagrange_output(x_nodes)
+            y_poly = calculate_lagrange_output(x_nodes, x_coords)
+            ax.plot(
+                x_coords,
+                y_poly,
+                label=rf"$P_{{{n[i]}}}(x)$",
+                color=default_colors[i + 1],
+            )
+            ax.scatter(x_nodes, y_nodes, color=default_colors[i + 1])
+            ax.set_title(title + f" (n = {n[i]})")
+            path = f"./plots_2/q2_3/chebyshev_p{n[i]}.png"
 
-    nodes_deg_20 = chebyshev_nodes(21)
-    y_nodes_20 = calculate_lagrange_output(nodes_deg_20)
-    y_poly_20 = calculate_lagrange_output(nodes_deg_20, x)
-    f5 = Figure(x, y_poly_20, r"$P_{20}(x)$", 3)
-    f6 = Figure(nodes_deg_20, y_nodes_20, "", 3, ".", "")
+        # Plot f(x) with all P(x)
+        else:
+            for j in range(len(n)):
+                x_nodes = chebyshev_nodes(n[j] + 1)
+                y_nodes = calculate_lagrange_output(x_nodes)
+                y_poly = calculate_lagrange_output(x_nodes, x_coords)
+                ax.plot(
+                    x_coords,
+                    y_poly,
+                    label=rf"$P_{{{n[j]}}}(x)$",
+                    color=default_colors[j + 1],
+                )
+                ax.set_title(title)
+                path = "./plots_2/q2_3/chebyshev_all.png"
 
-    # Merge and plot figures
-    fig1 = fig_f.copy().merge([f1, f2], title + " (n = 5)")
-    fig2 = fig_f.copy().merge([f3, f4], title + " (n = 10)")
-    fig3 = fig_f.copy().merge([f5, f6], title + " (n = 20)")
-    fig4 = fig_f.copy().merge([f1, f3, f5])
-    fig1.get_figure("./plots_2/q2_3/chebyshev_p5.png")
-    fig2.get_figure("./plots_2/q2_3/chebyshev_p10.png")
-    fig3.get_figure("./plots_2/q2_3/chebyshev_p20.png")
-    fig4.get_figure("./plots_2/q2_3/chebyshev_all.png")
-
-    # Generate and save equations to a text file
-    equations = [
-        generate_lagrange(nodes_deg_5, 5),
-        generate_lagrange(nodes_deg_10, 10),
-        generate_lagrange(nodes_deg_20, 20),
-    ]
-
-    with open("./plots_2/q2_3/lagrange_equations_chebyshev.txt", "w") as file:
-        for eq in equations:
-            file.write(eq + "\n")
-
-    plt.show()
+        # Configure axis and save figure
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.legend()
+        fig.savefig(path, dpi=300)
+        plt.show()
+        ax.cla()
+        
     # -----------------------------------------------------------
-
+    # Question 3 
+    # -----------------------------------------------------------
     # Question 3.3 (Chebyshev Polynomials)
     # -----------------------------------------------------------
+    # Polynomials list used for plotting in 3.4
+    polys = []
+
+    # Generate and save equations to a text file
     with open("./plots_2/q3_3/chebyshev_polynomials.txt", "w") as file:
-        for n in range(11):
-            equation = generate_chebyshev(n)
+        for n in range(6):
+            equation, poly = generate_chebyshev(n)
+            polys.append(poly)
             file.write(equation + "\n")
+
+    # -----------------------------------------------------------
+    # Question 3.34 (Plot Chebyshev Polynomials)
+    # -----------------------------------------------------------
+    # Plot Chebyshev Polynomials
+    x_coords = np.linspace(-1, 1, 100)
+    x = smp.symbols("x")
+
+    fig, ax = plt.subplots()
+    # Plot each polynomial
+    for i in range(6):
+        # Evaluate polynomial at each x coordinate
+        if i != 0:
+            y_coords = np.array(
+                [polys[i].evalf(subs={x: x_coords[j]}) for j in range(len(x_coords))]
+            )
+        # Case for T_0(x) = 1 
+        else:
+            y_coords = np.array([1 for _ in range(len(x_coords))])
+        ax.plot(x_coords, y_coords, label=rf"$T_{{{i}}}x)$")
+
+    # Configure axis and save figure
+    ax.set_title("Chebyshev Polynomials")
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$y$")
+    ax.legend()
+    fig.savefig("./plots_2/q3_4/chebyshev_polys.png", dpi=300)
+    plt.show()
+
+    # -----------------------------------------------------------
+    # Question 4
+    # -----------------------------------------------------------
+    # Question 4.3 (Lagrange for Nonsmooth Functions)
+    # -----------------------------------------------------------
+    title = "Equidistant Lagrange Interpolation"
+    x_coords = np.linspace(-1, 1, 200)
+    y_coords = abs(x_coords)
+    n = [2, 4, 6, 8]
+
+    # Plot f(x), P(x), nodes, and |R(x)| for each n
+    for i in range(len(n)+1):
+        fig, ax = plt.subplots()
+
+        if i < len(n):
+            ax.plot(x_coords, y_coords, label=r"$f(x)$")
+            x_nodes = np.linspace(-1, 1, n[i] + 1)
+            y_nodes = calculate_lagrange_output(x_nodes, x_nodes, abs)
+            y_poly = calculate_lagrange_output(x_nodes, x_coords, abs)
+            y_error = np.abs(y_coords - y_poly)
+            ax.plot(
+                x_coords,
+                y_poly,
+                label=rf"$P_{{{n[i]}}}(x)$",
+                color=default_colors[i + 1],
+            )
+            ax.scatter(x_nodes, y_nodes, color=default_colors[i + 1])
+            ax.plot(
+                x_coords,
+                y_error,
+                label=rf"$|R_{{{n[i]}}}(x)|$",
+                linestyle="dashed",
+                color='#e82351'
+            )
+            ax.set_title(title + f" (n = {n[i]})")
+            path = f"./plots_2/q4_3/p{n[i]}.png"
+        else:
+            # Plot |R(x)| for all n
+            for i in range(len(n)):
+                x_nodes = np.linspace(-1, 1, n[i] + 1)
+                y_nodes = calculate_lagrange_output(x_nodes, x_nodes, abs)
+                y_poly = calculate_lagrange_output(x_nodes, x_coords, abs)
+                y_error = np.abs(y_coords - y_poly)
+                ax.plot(
+                    x_coords,
+                    y_error,
+                    label=rf"$|R_{{{n[i]}}}(x)|$",
+                    color=default_colors[i]
+                )
+            path = "./plots_2/q4_3/error.png"
+            ax.set_title(title + " Error")
+            
+
+        # Configure axis and save figure
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.legend()
+        fig.savefig(path, dpi=300)
+        plt.show()
+        ax.cla()
     # -----------------------------------------------------------
