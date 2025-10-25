@@ -33,6 +33,12 @@ if __name__ == "__main__":
     plt.savefig('./outputs_3/forward_diff_graph.png', dpi=300)
     plt.show()
     
+    with open("./outputs_3/three_point_forward_diff.txt", "w") as file:
+        for k in range(1,11):
+            h =10**(-k)
+            f_prime = three_point_forward_diff(np.exp, 1.5, h)
+            file.write(f'\\[D_h^{{({k})}}f(1.5) = {f_prime}\\]\n')
+    
     h = np.logspace(-1, -10, 200)
     error = calc_absolute_error(np.exp, h, diff_method=three_point_forward_diff)
     

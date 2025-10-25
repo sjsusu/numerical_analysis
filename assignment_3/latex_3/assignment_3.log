@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.22)  25 OCT 2025 11:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.22)  25 OCT 2025 11:54
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -532,28 +532,28 @@ File: ../outputs_3/forward_diff_graph.png Graphic file (type png)
 Package pdftex.def Info: ../outputs_3/forward_diff_graph.png  used on input line 462.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
  [13 <../outputs_3/forward_diff_graph.png>] [14] [15]
-<../outputs_3/three_point_forward_diff_graph.png, id=270, 462.528pt x 346.896pt>
+<../outputs_3/three_point_forward_diff_graph.png, id=276, 462.528pt x 346.896pt>
 File: ../outputs_3/three_point_forward_diff_graph.png Graphic file (type png)
 <use ../outputs_3/three_point_forward_diff_graph.png>
-Package pdftex.def Info: ../outputs_3/three_point_forward_diff_graph.png  used on input line 507.
+Package pdftex.def Info: ../outputs_3/three_point_forward_diff_graph.png  used on input line 525.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
  [16 <../outputs_3/three_point_forward_diff_graph.png>] [17] [18] [19] [20]
-<../outputs_3/burgers_rk4.png, id=362, 462.528pt x 346.896pt>
+<../outputs_3/burgers_rk4.png, id=368, 462.528pt x 346.896pt>
 File: ../outputs_3/burgers_rk4.png Graphic file (type png)
 <use ../outputs_3/burgers_rk4.png>
-Package pdftex.def Info: ../outputs_3/burgers_rk4.png  used on input line 653.
+Package pdftex.def Info: ../outputs_3/burgers_rk4.png  used on input line 671.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
  [21 <../outputs_3/burgers_rk4.png>] [22]
-<../outputs_3/burgers_rk4_error.png, id=405, 462.528pt x 346.896pt>
+<../outputs_3/burgers_rk4_error.png, id=411, 462.528pt x 346.896pt>
 File: ../outputs_3/burgers_rk4_error.png Graphic file (type png)
 <use ../outputs_3/burgers_rk4_error.png>
-Package pdftex.def Info: ../outputs_3/burgers_rk4_error.png  used on input line 706.
+Package pdftex.def Info: ../outputs_3/burgers_rk4_error.png  used on input line 724.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
  [23 <../outputs_3/burgers_rk4_error.png>] [24]
-<../outputs_3/burgers_rk4_error_vs_time.png, id=447, 462.528pt x 346.896pt>
+<../outputs_3/burgers_rk4_error_vs_time.png, id=453, 462.528pt x 346.896pt>
 File: ../outputs_3/burgers_rk4_error_vs_time.png Graphic file (type png)
 <use ../outputs_3/burgers_rk4_error_vs_time.png>
-Package pdftex.def Info: ../outputs_3/burgers_rk4_error_vs_time.png  used on input line 757.
+Package pdftex.def Info: ../outputs_3/burgers_rk4_error_vs_time.png  used on input line 775.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
  [25 <../outputs_3/burgers_rk4_error_vs_time.png>] (../question_1.py [26] [27] [28] [29]) (../question_2.py [30]) (../question_3.py [31] [32]) [33] (./assignment_3.aux)
  ***********
@@ -564,18 +564,18 @@ Package rerunfilecheck Info: File `assignment_3.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 14109 strings out of 474116
- 210773 string characters out of 5743682
+ 14121 strings out of 474116
+ 210947 string characters out of 5743682
  2458187 words of memory out of 5000000
  35572 multiletter control sequences out of 15000+600000
  605397 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,12n,79p,657b,2188s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsso12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on assignment_3.pdf (33 pages, 1094196 bytes).
+Output written on assignment_3.pdf (33 pages, 1095915 bytes).
 PDF statistics:
- 1051 PDF objects out of 1200 (max. 8388607)
- 962 compressed objects within 10 object streams
- 692 named destinations out of 1000 (max. 500000)
+ 1065 PDF objects out of 1200 (max. 8388607)
+ 976 compressed objects within 10 object streams
+ 704 named destinations out of 1000 (max. 500000)
  41 words of extra memory for PDF output out of 10000 (max. 10000000)
 
