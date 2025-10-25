@@ -3,6 +3,8 @@
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{hyperref}
+\usepackage{ifthen}
 
 \usepackage{amssymb} 
 \usepackage{amsmath}
@@ -50,20 +52,30 @@
 
 \newcommand{\question}[1]{
     \stepcounter{question} 
-    \vspace{1em}
-    \textbf{\Large\thequestion \ - #1}
+    \ifnum\value{question}>1 \newpage \fi
+    \vspace{1.5em}
+    \textbf{\\ \Large\thequestion \ - #1}
     \vspace{.5em} 
     \setcounter{subquest}{0}\ \\}
 
-\newcommand{\subquestion}{
+\newcommand{\subquestion}[1][true]{
     \stepcounter{subquest} 
-    \vspace{.5em}
+    \ifthenelse{\equal{#1}{true} \and \value{subquest}>1}{\newpage}{}
+    \vspace{1em}
     \textbf{\large Question \thequestion.\thesubquest}
-    \vspace{.25em}\ \\}
+    \vspace{.5em}\ \\}
 
 \newcommand{\solution}
     {\par\vspace{0.5em}\noindent\emph{Solution.}\ }
     {\par\vspace{1em}}
+
+\newcommand{\startappendix}{%
+    \newpage
+    \vspace{1em}
+    {\Large\textbf{Appendix}}
+
+    The complete code used for this assignment is provided in the appendix for reference. Files can be accessed directly at this \href{https://github.com/sjsusu/numerical_analysis}{GitHub repository}.
+}
 
 \usepackage{fancyhdr}
 \setlength{\headheight}{15pt}

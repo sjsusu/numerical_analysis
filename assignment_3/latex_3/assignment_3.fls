@@ -95,6 +95,8 @@ INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/base/ifthen.sty
+INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/base/ifthen.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/amssymb.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/amssymb.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/amsfonts.sty
@@ -260,6 +262,16 @@ INPUT ../outputs_3/burgers_rk4_error_vs_time.png
 INPUT ../outputs_3/burgers_rk4_error_vs_time.png
 INPUT ../outputs_3/burgers_rk4_error_vs_time.png
 INPUT ../outputs_3/burgers_rk4_error_vs_time.png
+INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmss17.tfm
+INPUT ../question_1.py
+INPUT ../question_1.py
+INPUT ../question_1.py
+INPUT ../question_2.py
+INPUT ../question_2.py
+INPUT ../question_2.py
+INPUT ../question_3.py
+INPUT ../question_3.py
+INPUT ../question_3.py
 INPUT assignment_3.aux
 INPUT ./assignment_3.out
 INPUT ./assignment_3.out

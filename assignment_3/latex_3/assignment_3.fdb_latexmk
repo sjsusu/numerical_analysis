@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1761339574.99573 "/Users/User/Library/CloudStorage/OneDrive-TexasTechUniversity/Repos/numerical_analysis/assignment_3/latex_3/assignment_3.tex" "assignment_3.pdf" "assignment_3" 1761339576.65132 0
+["pdflatex"] 1761410100.59342 "/Users/User/Library/CloudStorage/OneDrive-TexasTechUniversity/Repos/numerical_analysis/assignment_3/latex_3/assignment_3.tex" "assignment_3.pdf" "assignment_3" 1761410102.41143 0
   "../outputs_3/burgers_rk4.png" 1761338051.66869 110386 e44542e3e9a70a5f408aaff1d30d9322 ""
   "../outputs_3/burgers_rk4_error.png" 1761326718.375 92166 6f523884909452c6b73104f2be151818 ""
   "../outputs_3/burgers_rk4_error_vs_time.png" 1761338053.75246 164245 9ab40ca3ed09ddab00450665af8d130b ""
@@ -8,7 +8,10 @@
   "../outputs_3/hermite_plot_h.png" 1761193178.07801 156724 c8973d70ec98094492ffdbbf6e7b98d8 ""
   "../outputs_3/hermite_plot_p.png" 1761193178.18202 158805 b98e3633ac410bc7feb90b803d9d513f ""
   "../outputs_3/three_point_forward_diff_graph.png" 1761253231.71815 133082 c17b66ab2286451a0c62e30249d0bf4a ""
-  "/Users/User/Library/CloudStorage/OneDrive-TexasTechUniversity/Repos/numerical_analysis/assignment_3/latex_3/assignment_3.tex" 1761339574.82733 26886 706413d5812479f06bb8240b6632ba69 ""
+  "../question_1.py" 1761193034.12226 5497 10b5f4b5e08fd7d3e65cc1ca45789320 ""
+  "../question_2.py" 1761253227.15377 1558 bfe46abd04883e717e1fc8a1ccf0ade3 ""
+  "../question_3.py" 1761406540.20153 4011 c01ba4e83c434f68e2794cb64756cfb5 ""
+  "/Users/User/Library/CloudStorage/OneDrive-TexasTechUniversity/Repos/numerical_analysis/assignment_3/latex_3/assignment_3.tex" 1761410100.41467 28404 8593ce07bb64c5378e18990ea9399822 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -23,6 +26,7 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmr12.tfm" 1136768653 1288 655e228510b4c2a1abe905c368440826 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmss10.tfm" 1254269338 11176 53ebf7a171df1f9447b387b178768bb5 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmss12.tfm" 1254269338 11232 955a7245396175d9219648eadc654ac9 ""
+  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmss17.tfm" 1254269338 11252 57c8b53a3aeebba8c17658d4221d47ec ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmss8.tfm" 1254269338 11180 705632ac6b4fb69204ad970192cdf4e5 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm" 1254269338 11168 06d87f5698fd1b642d96449b7c8d90b0 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmsso12.tfm" 1254269338 11352 d9e290eeb53800a380f9d1e4c40ad6c8 ""
@@ -82,6 +86,7 @@
   "/usr/local/texlive/2024/texmf-dist/tex/latex/base/atbegshi-ltx.sty" 1705352648 3045 273c666a54e60b9f730964f431a56c1b ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/base/atveryend-ltx.sty" 1705352648 2462 6bc53756156dbd71c1ad550d30a3b93f ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/base/fontenc.sty" 1705352648 5119 a04a8b68ab4f6ce800a41f7f8012a10e ""
+  "/usr/local/texlive/2024/texmf-dist/tex/latex/base/ifthen.sty" 1705352648 5319 2b738d02ce36ada6dcdd9534940db0ee ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/base/size12.clo" 1705352648 8449 f07039d8e4e89f21078d9b5137579bfc ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty" 1579991033 13886 d1306dcf79a944f6988e688c1785f9ce ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/etoolbox/etoolbox.sty" 1601931149 46845 3b58f70c6e861a13d927bff09d35ecbc ""
@@ -129,9 +134,9 @@
   "/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1724354839.98207 5467645 128b85b7cde5f5edc5cb7f1dd7ff8736 ""
   "/usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1724354831 8221424 f9c31bb8d957a0c00b152c295bf263d2 ""
   "/usr/local/texlive/2024/texmf.cnf" 1710266656 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "assignment_3.aux" 1761339576.58478 959 2ef58e8b9b1dc95d4db2d552278bbcb2 "pdflatex"
-  "assignment_3.out" 1761339575.27721 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "assignment_3.tex" 1761339574.82733 26886 706413d5812479f06bb8240b6632ba69 ""
+  "assignment_3.aux" 1761410102.34538 1431 8dc850dc386f0d192dfc63c096bf8963 "pdflatex"
+  "assignment_3.out" 1761410100.87806 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "assignment_3.tex" 1761410100.41467 28404 8593ce07bb64c5378e18990ea9399822 ""
   (generated)
   "assignment_3.aux"
   "assignment_3.log"

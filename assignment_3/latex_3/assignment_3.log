@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.22)  24 OCT 2025 15:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.22)  25 OCT 2025 11:35
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -180,6 +180,8 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
 )
 \Hy@SectionHShift=\skip50
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 ) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
  (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/amsfonts.sty
@@ -370,7 +372,7 @@ Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@O@olf=\skip64
 \f@nch@O@orf=\skip65
 )
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 77.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 88.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
@@ -380,24 +382,24 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 ) (./assignment_3.aux)
 \openout1 = `assignment_3.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 77.
-LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
 \c@lstlisting=\count302
  (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -418,7 +420,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (/usr/local/texlive/2024/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring OFF on input line 77.
+Package hyperref Info: Link coloring OFF on input line 88.
  (./assignment_3.out) (./assignment_3.out)
 \@outlinefile=\write3
 \openout3 = `assignment_3.out'.
@@ -460,100 +462,100 @@ Package hyperref Info: Link coloring OFF on input line 77.
 
 Couldn't patch \deferred@thm@head!
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <14.4> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 82.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 93.
 
-Underfull \hbox (badness 10000) in paragraph at lines 87--88
+Underfull \hbox (badness 10000) in paragraph at lines 98--99
 
  []
 
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 90.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 101.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 90.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 101.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 90.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 101.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 90.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 101.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 90.
+(Font)              <12> on input line 101.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 90.
+(Font)              <8> on input line 101.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 90.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 90.
+(Font)              <6> on input line 101.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 101.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 90.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 101.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <12> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 97.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 108.
  [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}
 
-{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [2{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] (/usr/local/texlive/2024/texmf-dist/tex/latex/listings/lstlang1.sty
+{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [2{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [3] [4] (/usr/local/texlive/2024/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/02/21 1.10 listings language file
-) [3]
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 195.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 195.
+)
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 206.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 206.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [4] [5] [6]
-<../outputs_3/hermite_plot_h.png, id=148, 462.528pt x 346.896pt>
+) [5] [6] [7] [8]
+<../outputs_3/hermite_plot_h.png, id=182, 462.528pt x 346.896pt>
 File: ../outputs_3/hermite_plot_h.png Graphic file (type png)
 <use ../outputs_3/hermite_plot_h.png>
-Package pdftex.def Info: ../outputs_3/hermite_plot_h.png  used on input line 343.
+Package pdftex.def Info: ../outputs_3/hermite_plot_h.png  used on input line 382.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
-<../outputs_3/hermite_plot_p.png, id=150, 462.528pt x 346.896pt>
+<../outputs_3/hermite_plot_p.png, id=184, 462.528pt x 346.896pt>
 File: ../outputs_3/hermite_plot_p.png Graphic file (type png)
 <use ../outputs_3/hermite_plot_p.png>
-Package pdftex.def Info: ../outputs_3/hermite_plot_p.png  used on input line 344.
+Package pdftex.def Info: ../outputs_3/hermite_plot_p.png  used on input line 383.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
-<../outputs_3/hermite_plot.png, id=151, 462.528pt x 346.896pt>
+<../outputs_3/hermite_plot.png, id=185, 462.528pt x 346.896pt>
 File: ../outputs_3/hermite_plot.png Graphic file (type png)
 <use ../outputs_3/hermite_plot.png>
-Package pdftex.def Info: ../outputs_3/hermite_plot.png  used on input line 345.
+Package pdftex.def Info: ../outputs_3/hermite_plot.png  used on input line 384.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
- [7 <../outputs_3/hermite_plot_h.png> <../outputs_3/hermite_plot_p.png>] [8 <../outputs_3/hermite_plot.png>] [9]
-<../outputs_3/forward_diff_graph.png, id=180, 462.528pt x 346.896pt>
+ [9 <../outputs_3/hermite_plot_h.png> <../outputs_3/hermite_plot_p.png>] [10 <../outputs_3/hermite_plot.png>] [11] [12]
+<../outputs_3/forward_diff_graph.png, id=217, 462.528pt x 346.896pt>
 File: ../outputs_3/forward_diff_graph.png Graphic file (type png)
 <use ../outputs_3/forward_diff_graph.png>
-Package pdftex.def Info: ../outputs_3/forward_diff_graph.png  used on input line 425.
+Package pdftex.def Info: ../outputs_3/forward_diff_graph.png  used on input line 462.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
- [10] [11 <../outputs_3/forward_diff_graph.png>]
-<../outputs_3/three_point_forward_diff_graph.png, id=214, 462.528pt x 346.896pt>
+ [13 <../outputs_3/forward_diff_graph.png>] [14] [15]
+<../outputs_3/three_point_forward_diff_graph.png, id=270, 462.528pt x 346.896pt>
 File: ../outputs_3/three_point_forward_diff_graph.png Graphic file (type png)
 <use ../outputs_3/three_point_forward_diff_graph.png>
-Package pdftex.def Info: ../outputs_3/three_point_forward_diff_graph.png  used on input line 469.
+Package pdftex.def Info: ../outputs_3/three_point_forward_diff_graph.png  used on input line 507.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
- [12 <../outputs_3/three_point_forward_diff_graph.png>] [13] [14] [15]
-<../outputs_3/burgers_rk4.png, id=286, 462.528pt x 346.896pt>
+ [16 <../outputs_3/three_point_forward_diff_graph.png>] [17] [18] [19] [20]
+<../outputs_3/burgers_rk4.png, id=362, 462.528pt x 346.896pt>
 File: ../outputs_3/burgers_rk4.png Graphic file (type png)
 <use ../outputs_3/burgers_rk4.png>
-Package pdftex.def Info: ../outputs_3/burgers_rk4.png  used on input line 616.
+Package pdftex.def Info: ../outputs_3/burgers_rk4.png  used on input line 653.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
- [16] [17 <../outputs_3/burgers_rk4.png>]
-<../outputs_3/burgers_rk4_error.png, id=338, 462.528pt x 346.896pt>
+ [21 <../outputs_3/burgers_rk4.png>] [22]
+<../outputs_3/burgers_rk4_error.png, id=405, 462.528pt x 346.896pt>
 File: ../outputs_3/burgers_rk4_error.png Graphic file (type png)
 <use ../outputs_3/burgers_rk4_error.png>
-Package pdftex.def Info: ../outputs_3/burgers_rk4_error.png  used on input line 668.
+Package pdftex.def Info: ../outputs_3/burgers_rk4_error.png  used on input line 706.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
- [18 <../outputs_3/burgers_rk4_error.png>]
-<../outputs_3/burgers_rk4_error_vs_time.png, id=366, 462.528pt x 346.896pt>
+ [23 <../outputs_3/burgers_rk4_error.png>] [24]
+<../outputs_3/burgers_rk4_error_vs_time.png, id=447, 462.528pt x 346.896pt>
 File: ../outputs_3/burgers_rk4_error_vs_time.png Graphic file (type png)
 <use ../outputs_3/burgers_rk4_error_vs_time.png>
-Package pdftex.def Info: ../outputs_3/burgers_rk4_error_vs_time.png  used on input line 718.
+Package pdftex.def Info: ../outputs_3/burgers_rk4_error_vs_time.png  used on input line 757.
 (pdftex.def)             Requested size: 350.33727pt x 262.76501pt.
- [19] [20 <../outputs_3/burgers_rk4_error_vs_time.png>] (./assignment_3.aux)
+ [25 <../outputs_3/burgers_rk4_error_vs_time.png>] (../question_1.py [26] [27] [28] [29]) (../question_2.py [30]) (../question_3.py [31] [32]) [33] (./assignment_3.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -562,18 +564,18 @@ Package rerunfilecheck Info: File `assignment_3.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 13618 strings out of 474116
- 203709 string characters out of 5743682
- 2390187 words of memory out of 5000000
- 35485 multiletter control sequences out of 15000+600000
- 602608 words of font info for 67 fonts, out of 8000000 for 9000
+ 14109 strings out of 474116
+ 210773 string characters out of 5743682
+ 2458187 words of memory out of 5000000
+ 35572 multiletter control sequences out of 15000+600000
+ 605397 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,12n,79p,657b,2188s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsso12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on assignment_3.pdf (20 pages, 1053797 bytes).
+Output written on assignment_3.pdf (33 pages, 1094196 bytes).
 PDF statistics:
- 537 PDF objects out of 1000 (max. 8388607)
- 466 compressed objects within 5 object streams
- 303 named destinations out of 1000 (max. 500000)
+ 1051 PDF objects out of 1200 (max. 8388607)
+ 962 compressed objects within 10 object streams
+ 692 named destinations out of 1000 (max. 500000)
  41 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -98,14 +98,14 @@ if __name__ == "__main__":
     plt.savefig('./outputs_3/burgers_rk4.png', dpi=300)
     plt.cla()
     
-    # dx_list = np.logspace(-2, -9, 18, base=2)
-    # dx, error = spacial_convergence(dx_list, t_final)
-    # plt.loglog(dx, error, label='$||u - u_h||_{L^2}$')
-    # plt.xlabel('$\\log(\\Delta x)$')
-    # plt.title('L2 Error vs Spatial Step Size')
-    # plt.legend()
-    # plt.savefig('./outputs_3/burgers_rk4_error.png', dpi=300)
-    # plt.show()
+    dx_list = np.logspace(-2, -9, 18, base=2)
+    dx, error = spacial_convergence(dx_list, t_final)
+    plt.loglog(dx, error, label='$||u - u_h||_{L^2}$')
+    plt.xlabel('$\\log(\\Delta x)$')
+    plt.title('L2 Error vs Spatial Step Size')
+    plt.legend()
+    plt.savefig('./outputs_3/burgers_rk4_error.png', dpi=300)
+    plt.show()
     
     dx_list = np.logspace(-2, -6, 5, base=2)
 

@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage{ifthen}
 
 \usepackage{amssymb} 
 \usepackage{amsmath}
@@ -51,20 +52,30 @@
 
 \newcommand{\question}[1]{
     \stepcounter{question} 
-    \vspace{1em}
-    \textbf{\Large\thequestion \ - #1}
+    \ifnum\value{question}>1 \newpage \fi
+    \vspace{1.5em}
+    \textbf{\\ \Large\thequestion \ - #1}
     \vspace{.5em} 
     \setcounter{subquest}{0}\ \\}
 
-\newcommand{\subquestion}{
+\newcommand{\subquestion}[1][true]{
     \stepcounter{subquest} 
-    \vspace{.5em}
+    \ifthenelse{\equal{#1}{true} \and \value{subquest}>1}{\newpage}{}
+    \vspace{1em}
     \textbf{\large Question \thequestion.\thesubquest}
-    \vspace{.25em}\ \\}
+    \vspace{.5em}\ \\}
 
 \newcommand{\solution}
     {\par\vspace{0.5em}\noindent\emph{Solution.}\ }
     {\par\vspace{1em}}
+
+\newcommand{\startappendix}{%
+    \newpage
+    \vspace{1em}
+    {\Large\textbf{Appendix}}
+
+    The complete code used for this assignment is provided in the appendix for reference. Files can be accessed directly at this \href{https://github.com/sjsusu/numerical_analysis}{GitHub repository}.
+}
 
 \usepackage{fancyhdr}
 \setlength{\headheight}{15pt}
@@ -139,7 +150,7 @@ So the cubic Hermite interpolant is:
 \[H(x) = \begin{cases} -\frac{625}{338}x^3 - \frac{475}{169}x^2 + 1, & x\in[-1,0] \\[6pt] \frac{625}{338}x^3 - \frac{475}{169}x^2 + 1, & x\in[0,1] \end{cases}\]
 
 Evaluating at $x=0.5$, we get that:
-\[H(0.5) = \frac{625}{338}(0.5)^3 - \frac{475}{338}(0.5)^2 + 1 = \frac{1429}{2704} \approx 0.528479290\]
+\[H(0.5) = \frac{625}{338}(0.5)^3 - \frac{475}{169}(0.5)^2 + 1 = \frac{1429}{2704} \approx 0.528479290\]
 
 \subquestion
 Evaluate the absolution error of $f(0.5)-H(0.5)$, and show that the error agrees the prior estimate of 
@@ -333,11 +344,39 @@ $z_3$ & $1$ & $0.0385$ & $0.0000$ & $0.0000$ & $0.0000$ \\
     &+ 1.849112426035503(x)^2(x - 1)
 \end{align*}
 
-\newpage
 \subquestion
 Plot $f(x)$, $H(x)$ and $P(x)$ on $x\in[-1,1]$.
 
 \solution
+The following code was used to plot the functions:
+\begin{lstlisting}[language=Python, caption=1.4 Python]
+import numpy as np
+import matplotlib.pyplot as plt
+
+if __name__ == "__main__":
+    #<Some matplotlib styling and enable LaTeX>
+    x = np.linspace(-1, 1, 200)
+    f_y = f(x)
+
+    conditions = [x <= 0, x > 0]
+    h_y = np.piecewise(x, conditions, [h_1, h_2])
+    p_y = np.concatenate(
+        (calculate_hermite(nodes_1, x[:100]), calculate_hermite(nodes_2, x[100:]))
+    )
+    
+    plt.plot(x, f_y, label="$f(x)$")
+    plt.plot(x, h_y, label="$H(x)$")
+    plt.xlabel("$x$")
+    plt.ylabel("$y$")
+    plt.legend()
+    plt.title("Function and Cubic Hermite")
+    plt.savefig("./outputs_3/hermite_plot_h.png", dpi=300)
+    plt.cla()
+    
+    # Similar Plotting for P(x) and for all three together
+\end{lstlisting}
+
+\newpage
 The following plots were generated:
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../outputs_3/hermite_plot_h.png}
@@ -346,8 +385,6 @@ The following plots were generated:
 \end{center}
 
 We observe that both Hermite interpolants $H(x)$ and $P(x)$ are identical and loosely follow the behavior of $f(x)$ on the interval $[-1,1]$.
-
-\newpage
 
 \question{Simple Analysis on Finite Difference}
 Consider the forward difference formula for the first derivative of a smooth function $f(x)$:
@@ -463,7 +500,8 @@ if __name__ == "__main__":
     plt.savefig('./outputs_3/three_point_forward_diff_graph.png', dpi=300)
     plt.show()
 \end{lstlisting}
-
+ 
+\newpage
 The resulting plot was:
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../outputs_3/three_point_forward_diff_graph.png}
@@ -471,7 +509,6 @@ The resulting plot was:
 
 We observe that machine error starts to occur as $h$ gets smaller than approximately than $10^{-5}$.
 
-\newpage
 
 \question{Solve Burger's Equation by Finite Difference Scheme}
 Consider the 1D viscous Burgers' equation:
@@ -610,7 +647,7 @@ if __name__ == "__main__":
     plt.savefig('./outputs_3/burgers_rk4.png', dpi=300)
     plt.show()
 \end{lstlisting}
-
+\newpage
 The resulting plot at $T=1$ second was:
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../outputs_3/burgers_rk4.png}
@@ -663,6 +700,7 @@ if __name__ == "__main__":
     plt.show()
 \end{lstlisting}
 
+
 The plot generated for spatial convergence at $T=1$ was:
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../outputs_3/burgers_rk4_error.png}
@@ -713,6 +751,7 @@ if __name__ == "__main__":
     plt.show()
 \end{lstlisting}
 
+\newpage
 The plot generated for $L^2$ error vs time was:
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../outputs_3/burgers_rk4_error_vs_time.png}
@@ -721,5 +760,11 @@ The plot generated for $L^2$ error vs time was:
 We can see that the $L^2$ error generally increases with time and then stabilizes. The increase makes sense as numerical errors accumulate over time steps.
  
 Finer meshes (smaller $h$) consistently yield lower errors throughout the simulation at $T=1$.
+
+\startappendix
+
+\lstinputlisting[language=Python, caption={question\_1.py}]{../question_1.py}
+\lstinputlisting[language=Python, caption={question\_2.py}]{../question_2.py}
+\lstinputlisting[language=Python, caption={question\_3.py}]{../question_3.py}
 
 \end{document}
