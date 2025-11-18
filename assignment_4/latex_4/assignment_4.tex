@@ -181,12 +181,13 @@ So our forcing term is:
 and we are working with the homogeneous heat equation.
 
 \question
-Discretize the spacial domain $\Omega$ into $16$ equal square elements arranged in a $4 \times 4$ grid, with the node coordinates:
-\[(x,y) \in \{-2,-1,0,1,2\} \times \{-2,-1,0,1,2\}\]
+Discretize the spacial domain $\Omega$ into $16$ square elements arranged in a $4 \times 4$ grid, with the node coordinates:
+\[(x,y) \in \{-2,-1.6,-1.2,-0.8,2\} \times \{-2,-1.6,-1.2,-0.8,2\}\]
 Draw this mesh, define your own global numbering, label all global node numbers, and generate corresponding elemental connectivities.
 
 \solution
-All indexing used will start from $0$. The mesh is as follows:
+All indexing used will start from $0$. 
+The mesh is as follows:
 \begin{center}
 \includegraphics[width=.75\textwidth]{mesh.jpg}
 \end{center}
@@ -194,15 +195,10 @@ All indexing used will start from $0$. The mesh is as follows:
 Globally, we have $25$ nodes numbered from $0$ to $24$. Numbering starts from the top-left corner and goes row-wise. The elements are numbered from $0$ to $15$, also row-wise in the same fashion. For each element, its indicies $(0, 1,2,3)$ start from the bottom-left and go counter-clockwise to match the definition of the bilinear $Q1$ element. 
 The folowing code was used to generate the connectivity matrix:
 \begin{lstlisting}[language=Python, caption={Question 2 Code}]
-import numpy as np
-import sympy as sp
-
-def global_indexing(width, height=None, include_boundary=False):
+def global_indexing(width, height=None):
     if height is None:
         height = width
-    if include_boundary:
-        return np.arange(width * height).reshape((width, height))
-    return np.arange((width-2)*(height-2)).reshape((width-2, height-2))
+    return np.arange(width * height).reshape((height, width))
 
 def generate_connectivity_matrix(global_indices):
     total_elements = (global_indices.shape[0] - 1) * (global_indices.shape[1] - 1)
@@ -210,6 +206,8 @@ def generate_connectivity_matrix(global_indices):
     element = 0
     for i in range(global_indices.shape[0] - 1):
         for j in range(global_indices.shape[1] - 1):
+            # Element node ordering: bottom-left, bottom-right, 
+            #top-right, top-left
             connectivity_matrix[element, 0] = global_indices[i+1, j]
             connectivity_matrix[element, 1] = global_indices[i+1, j+1]
             connectivity_matrix[element, 2] = global_indices[i, j+1]
@@ -219,15 +217,17 @@ def generate_connectivity_matrix(global_indices):
 
 if __name__ == "__main__":
     width = 5  # Number of nodes along one dimension
-    global_with_boundary = global_indexing(width, include_boundary=True)
-    connectivity_matrix_with_boundary = generate_connectivity_matrix(global_with_boundary)
+    global_indices = global_indexing(width)
+    connectivity_matrix = generate_connectivity_matrix(global_indices)
 
     with open("./outputs_4/matrices.txt", "w") as f:
-        latex_matrix = sp.latex(sp.Matrix(connectivity_matrix_with_boundary))
-        f.write("Connectivity Matrix with Boundary:\n")
+        # print(connectivity_matrix)
+        latex_matrix = sp.latex(sp.Matrix(connectivity_matrix))
+        f.write("Connectivity Matrix:\n")
         f.write(latex_matrix + "\n\n")
 \end{lstlisting}
 The elemental connectivities are as follows:
+
 \begin{center}
     \begin{tabular}{c| c c c c}
         Element & Node 0 & Node 1 & Node 2 & Node 3 \\
@@ -341,11 +341,9 @@ Then for each $\Phi_i(x,y)$, we have:
 \end{bmatrix} \\
 &= \begin{bmatrix}
 \frac{2}{x_1 - x_0} \frac{\partial \Phi_i}{\partial \xi} \\ \frac{2}{y_1 - y_0} \frac{\partial \Phi_i}{\partial \eta}
-\end{bmatrix}
+\end{bmatrix} \\
+&= 2 \begin{bmatrix} \frac{1}{x_1 - x_0} \frac{\partial \Phi_i}{\partial \xi} \\ \frac{1}{y_1 - y_0} \frac{\partial \Phi_i}{\partial \eta} \end{bmatrix}
 \end{align*}
-
-Since we have square elements of length $1$, we have $x_1 - x_0 = 1$ and $y_1 - y_0 = 1$. Therefore, the physical gradients simplify to:
-\[\nabla \Phi_i(x,y) = 2 \nabla \Phi_i(\xi,\eta)\]
 
 Let us first calculate $\nabla \Phi_i(\xi,\eta)$. For reference, the shape functions are:
 \[\Phi_0(\xi,\eta) = \frac{1}{4}(1-\xi)(1-\eta), \quad \Phi_1(\xi,\eta) = \frac{1}{4}(1+\xi)(1-\eta),\]
@@ -372,14 +370,14 @@ Therefore, the gradients in reference coordinates are:
 \end{bmatrix}\]
 So we have the physical gradients:
 \[\nabla  \Phi_0(x,y) = \frac{1}{2}\begin{bmatrix}
--(1-\eta) \\ -(1-\xi)
+-\frac{1}{x_1 - x_0}(1-\eta) \\ -\frac{1}{y_1-y_0}(1-\xi)
 \end{bmatrix}, \quad \nabla  \Phi_1(x,y) = \frac{1}{2}\begin{bmatrix}
-(1-\eta) \\ -(1+\xi)
+\frac{1}{x_1-x_0}(1-\eta) \\ -\frac{1}{y_1-y_0}(1+\xi)
 \end{bmatrix}\] 
 \[\nabla  \Phi_2(x,y) = \frac{1}{2}\begin{bmatrix}
-(1+\eta) \\ (1+\xi)
+\frac{1}{x_1-x_0}(1+\eta) \\ \frac{1}{y_1-y_0}(1+\xi)
 \end{bmatrix}, \quad \nabla  \Phi_3(x,y) = \frac{1}{2}\begin{bmatrix}
--(1+\eta) \\ (1-\xi)
+-\frac{1}{x_1-x_0}(1+\eta) \\ \frac{1}{y_1-y_0}(1-\xi)
 \end{bmatrix}\]
 
 
@@ -393,12 +391,12 @@ For ease of notation let $\Phi_i^{(e)} = \Phi_i$.
 
 Let us denote $\Phi = [\Phi_0, \Phi_1, \Phi_2, \Phi_3]^T$ as the vector of shape functions for element $e$. Note that $M^{(e)}$ can also be expressed a $M^{(e)} = \int_{\Omega_e} \Phi \cdot \Phi^T \ dx$. Using the change of variables from physical to reference coordinates, we have:
 \[M^{(e)} = \int_{-1}^{1} \int_{-1}^{1} \Phi \cdot \Phi^T |\det{J(\xi,\eta)}| \ d\xi d\eta\]
-where $|\det{J(\xi,\eta)}|$ is the absolute value of the determinant of our Jacobian. From question 5, we have:
-\[|\det{J(\xi,\eta)}| = \left| \frac{(x_1-x_0)}{2} \cdot \frac{(y_2-y_1)}{2}\right| = \frac{|x_1-x_0| \cdot |y_2-y_1|}{4}\]
+where $|\det{J(\xi,\eta)}|$ is the absolute value of the determinant of our Jacobian. Let the width of the node be $w = (x_1 - x_0)$ and the height be $h = (y_2 - y_1)$. From question 5, we have:
+\[|\det{J(\xi,\eta)}| = \left| \frac{w}{2} \cdot \frac{h}{2}\right| = \frac{|w| \cdot |h|}{4}\]
 When corrected for our local indexing scheme.
 
 Since this constant, we can factor it out of the integral:
-\[M^{(e)} = \frac{|x_1-x_0| \cdot |y_2-y_1|}{4} \int_{-1}^{1} \int_{-1}^{1} \Phi \cdot \Phi^T \ d\xi d\eta\]
+\[M^{(e)} = \frac{|w| \cdot |h|}{4} \int_{-1}^{1} \int_{-1}^{1} \Phi \cdot \Phi^T \ d\xi d\eta\]
 Note that:
 \[\Phi \cdot \Phi^T = \begin{bmatrix} 
     \Phi_0 \\ \Phi_1 \\ \Phi_2 \\ \Phi_3
@@ -445,7 +443,7 @@ Case: 2nd Off-diagonal entry ($i=0, j=2$):
 &= \frac{1}{16} \cdot \frac{4}{3} \cdot \frac{4}{3}\\
 &= \frac{1}{9}
 \end{align*}
-Case: 3rd Off-diagonal entry ($i=0, j=3$):
+Case: Skew-Diagonal entry ($i=0, j=3$):
 
 Same as 1st off-diagonal by symmetry, so the result is $\frac{2}{9}$.
 
@@ -460,21 +458,13 @@ Substituting all these results back into the integral matrix, we have:
 2 & 1 & 2 & 4
 \end{bmatrix}\]
 Therefore, the elemental mass matrix is:
-\[M^{(e)} = \frac{|x_1-x_0| \cdot |y_2-y_1|}{4} \cdot \frac{1}{9}
+\[M^{(e)} = \frac{|w| \cdot |h|}{4} \cdot \frac{1}{9}
 \begin{bmatrix}
 4 & 2 & 1 & 2 \\
 2 & 4 & 2 & 1 \\
 1 & 2 & 4 & 2 \\
 2 & 1 & 2 & 4
 \end{bmatrix}\]
-For our mesh, all elements are squares of side length $1$, so $|x_1 - x_0| = |y_1 - y_0| = 1$. Therefore, we have:
-\[M^{(e)} = \frac{1}{36}
-\begin{bmatrix}
-4 & 2 & 1 & 2 \\
-2 & 4 & 2 & 1 \\
-1 & 2 & 4 & 2 \\
-2 & 1 & 2 & 4
-\end{bmatrix}\] 
 
 Next, we compute the elemental stiffness matrix $K^{(e)}$. Denote $\nabla \Phi = [\nabla \Phi_0, \nabla \Phi_1, \nabla \Phi_2, \nabla \Phi_3]$. Note that $K^{(e)}$ can also be expressed as:
 \[K^{(e)} = \int_{\Omega_e} \nabla \Phi(x,y) \cdot \nabla \Phi^T(x,y) \ dx\]
@@ -482,21 +472,22 @@ Using the change of variables, we have:
 \[K^{(e)} = \int_{-1}^{1} \int_{-1}^{1} (J^{-1}\nabla \Phi(\xi,\eta)) \cdot (J^{-1} \nabla \Phi(\xi,\eta))^T |\det{J(\xi,\eta)}| \ d\xi d\eta\]
 
 With the Jacobian determinant factored out, we have:
-\[K^{(e)} = \frac{ |x_1 - x_0| \cdot |y_2 - y_1|}{4} \int_{-1}^{1} \int_{-1}^{1} (J^{-1}\nabla \Phi(\xi,\eta)) \cdot (J^{-1} \nabla \Phi(\xi,\eta))^T \ d\xi d\eta\]
-As reference from question 4, we have the gradients:
+\[K^{(e)} = \frac{ |w| \cdot |h|}{4} \int_{-1}^{1} \int_{-1}^{1} (J^{-1}\nabla \Phi(\xi,\eta)) \cdot (J^{-1} \nabla \Phi(\xi,\eta))^T \ d\xi d\eta\]
+As reference from question 4, when corrected for our indexing scheme, we have the physical gradients:
 \[\nabla  \Phi_0(x,y) = \frac{1}{2}\begin{bmatrix}
--(1-\eta) \\ -(1-\xi)
+-\frac{1}{w}(1-\eta) \\ -\frac{1}{h}(1-\xi)
 \end{bmatrix}, \quad \nabla  \Phi_1(x,y) = \frac{1}{2}\begin{bmatrix}
-(1-\eta) \\ -(1+\xi)
+\frac{1}{w}(1-\eta) \\ -\frac{1}{h}(1+\xi)
 \end{bmatrix}\] 
 \[\nabla  \Phi_2(x,y) = \frac{1}{2}\begin{bmatrix}
-(1+\eta) \\ (1+\xi)
+\frac{1}{w}(1+\eta) \\ \frac{1}{h}(1+\xi)
 \end{bmatrix}, \quad \nabla  \Phi_3(x,y) = \frac{1}{2}\begin{bmatrix}
--(1+\eta) \\ (1-\xi)
+-\frac{1}{w}(1+\eta) \\ \frac{1}{h}(1-\xi)
 \end{bmatrix}\]
-Note any product of the form $\nabla \Phi_i \cdot \nabla \Phi_j$ will have a factor of $\frac{1}{4}$.
-
-Note that :
+so note that $J^{-1}\nabla \Phi(\xi,\eta) = \frac{1}{2} \cdot 2 \nabla \Phi(\xi,\eta)$. In other words we rewrite can each physical gradient above in terms of reference coordinates without the $\frac{1}{2}$ factor. Until further notice we denote $\nabla \Phi$ instead of $2\nabla \Phi$ for ease of notation.
+Therefore:
+\[K^{(e)} = \frac{ |w| \cdot |h|}{16} \int_{-1}^{1} \int_{-1}^{1} \nabla \Phi(\xi,\eta) \cdot \nabla \Phi^T(\xi,\eta) \ d\xi d\eta\]
+Also note that :
 \[\nabla \Phi \cdot \nabla \Phi^T = \begin{bmatrix}
 \nabla \Phi_0 \cdot \nabla \Phi_0  & \nabla \Phi_0  \cdot \nabla \Phi_1  & \nabla \Phi_0  \cdot \nabla \Phi_2  & \nabla \Phi_0  \cdot \nabla \Phi_3  \\
 \nabla \Phi_1  \cdot \nabla \Phi_0  & \nabla \Phi_1  \cdot \nabla \Phi_1  & \nabla \Phi_1  \cdot \nabla \Phi_2  & \nabla \Phi_1  \cdot \nabla \Phi_3  \\
@@ -507,64 +498,117 @@ The stiffness matrix is also symmetric, so we will only show one sample calculat
 
 Case: Main-diagonal entry ($i=j=0$):
 \begin{align*}
-\int_{-1}^{1} \int_{-1}^{1} \nabla \Phi_0 \cdot \nabla \Phi_0 \ d\xi d\eta &= \int_{-1}^{1} \int_{-1}^{1} \left(-\frac{1}{2}(1-\eta)\right)^2 + \left(-\frac{1}{2}(1-\xi)\right)^2 \ d\xi d\eta \\
-&= \frac{1}{4} \int_{-1}^1 \int_{-1}^1 (1-\eta)^2 + (1-\xi)^2 \ d\xi d\eta \\
-&=\frac{1}{4} \left[\int_{-1}^1 (1-\eta)^2 \ \int_{-1}^1 \ d\xi \ d\eta + \int_{-1}^1 (1-\xi)^2 \ \int_{-1}^1 \ d\eta \ d\xi \right] \\
-&= \frac{1}{4} \left[ 2\int_{-1}^1 (1-\eta)^2 d\eta + 2\int_{-1}^1  (1-\xi)^2 d\xi \right] \\
-&= \frac{1}{2} \left[ \frac{8}{3} + \frac{8}{3} \right] \\
-&= \frac{1}{2} \cdot \frac{16}{3} \\
-&= \frac{8}{3} \\
-&= \frac{4}{6} \cdot 4
+\int_{-1}^{1} \int_{-1}^{1} \nabla \Phi_0 \cdot \nabla \Phi_0 \ d\xi d\eta &= \int_{-1}^{1} \int_{-1}^{1} \left(-\frac{1}{w}(1-\eta)\right)^2 + \left(-\frac{1}{h}(1-\xi)\right)^2 \ d\xi d\eta \\
+&= \frac{1}{w^2} \int_{-1}^1 \int_{-1}^1 (1-\eta)^2 \ d\xi d\eta + \frac{1}{h^2} \int_{-1}^1 \int_{-1}^1 (1-\xi)^2 \ d\xi d\eta \\
+&= \frac{2}{w^2} \int_{-1}^1 (1-\eta)^2 \ d\eta + \frac{2}{h^2}\int_{-1}^1 (1-\xi)^2 \ d\xi \\
+&= \frac{2}{w^2} \cdot \frac{8}{3} + \frac{2}{h^2} \cdot \frac{8}{3}\\
+&= \frac{16}{3w^2} + \frac{16}{3h^2}\\
+&= \frac{16}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right)
+\end{align*}
+
+Case: Skew-Diagonal entry ($i=0, j=3$):
+\begin{align*}
+    \int_{-1}^{1} \int_{-1}^{1} \nabla \Phi_0 \cdot \nabla \Phi_3 \ d\xi d\eta &= \int_{-1}^{1} \int_{-1}^{1} \frac{1}{w^2}(1-\eta)(1+\eta) - \frac{1}{h^2}(1-\xi)(1-\xi) \ d\xi d\eta \\
+&= \frac{1}{w^2} \int_{-1}^1 \int_{-1}^1 (1-\eta^2) \ d\xi d\eta - \frac{1}{h^2} \int_{-1}^1 \int_{-1}^1 (1-\xi)^2 \ d\xi d\eta \\
+&= \frac{2}{w^2} \int_{-1}^1 (1-\eta)^2 \ d\eta - \frac{2}{h^2}\int_{-1}^1 (1-\xi)^2 \ d\xi \\
+&= \frac{2}{w^2} \cdot \frac{4}{3} - \frac{2}{h^2} \cdot \frac{8}{3}\\
+&= \frac{8}{3w^2} - \frac{16}{3h^2}\\
+&= \frac{8}{3} \left(\frac{1}{w^2} - \frac{2}{h^2}\right)
 \end{align*}
 
 Case: First Off-Diagonal entry ($i=0, j=1$):
 \begin{align*}
-\int_{-1}^{1} \int_{-1}^{1} \nabla \Phi_0 \cdot \nabla \Phi_1 \ d\xi d\eta &= \int_{-1}^{1} \int_{-1}^{1} \left(-\frac{1}{2}(1-\eta)\right)\left(\frac{1}{2}(1-\eta)\right) + \left(-\frac{1}{2}(1-\xi)\right)\left(-\frac{1}{2}(1+\xi)\right) \ d\xi d\eta \\
-&= \frac{1}{4} \int_{-1}^1 \int_{-1}^1 -(1-\eta)^2 + (1-\xi^2) \ d\xi d\eta \\
-&=\frac{1}{4} \left[\int_{-1}^1 -(1-\eta)^2 \ \int_{-1}^1 \ d\xi \ d\eta + \int_{-1}^1 (1-\xi^2) \ \int_{-1}^1 \ d\eta \ d\xi \right] \\
-&= \frac{1}{4} \left[ -2\int_{-1}^1 (1-\eta)^2 d\eta + 2\int_{-1}^1  (1-\xi^2) d\xi \right] \\
-&= \frac{1}{2} \left[ -\frac{8}{3} + \frac{4}{3} \right] \\
-&= \frac{1}{2} \cdot \left(-\frac{4}{3}\right) \\
-&= -\frac{2}{3} \\
-&= \frac{4}{6} \cdot (-1)
+    \int_{-1}^{1} \int_{-1}^{1} \nabla \Phi_0 \cdot \nabla \Phi_1 \ d\xi d\eta &= \int_{-1}^{1} \int_{-1}^{1} -\frac{1}{w^2}(1-\eta)^2 + \frac{1}{h^2}(1-\xi)(1+\xi) \ d\xi d\eta \\
+    &= -\frac{1}{w^2} \int_{-1}^1 \int_{-1}^1 (1-\eta)^2 \ d\xi d\eta + \frac{1}{h^2} \int_{-1}^1 \int_{-1}^1 (1-\xi^2) \ d\xi d\eta \\
+    &= -\frac{2}{w^2} \int_{-1}^1 (1-\eta)^2 \ d\eta + \frac{2}{h^2}\int_{-1}^1 (1-\xi^2) \ d\xi \\
+    &= -\frac{2}{w^2} \cdot \frac{8}{3} + \frac{2}{h^2} \cdot \frac{4}{3}\\
+    &= -\frac{16}{3w^2} + \frac{8}{3h^2}\\
+    &= -\frac{8}{3} \left(\frac{2}{w^2} - \frac{1}{h^2}\right)
 \end{align*}
 
 Case: Second Off-Diagonal entry ($i=0, j=2$):
 \begin{align*}
-    \int_{-1}^{1} \int_{-1}^{1} \nabla \Phi_0 \cdot \nabla \Phi_2 \ d\xi d\eta &= \int_{-1}^{1} \int_{-1}^{1} \left(-\frac{1}{2}(1-\eta)\right)\left(\frac{1}{2}(1+\eta)\right) + \left(-\frac{1}{2}(1-\xi)\right)\left(\frac{1}{2}(1+\xi)\right) \ d\xi d\eta \\
-&= -\frac{1}{4} \int_{-1}^1 \int_{-1}^1 (1-\eta^2) + (1-\xi^2) \ d\xi d\eta \\
-&=\ -\frac{1}{4} \left[\int_{-1}^1 (1-\eta^2) \ \int_{-1}^1 \ d\xi \ d\eta + \int_{-1}^1 (1-\xi^2) \ \int_{-1}^1 \ d\eta \ d\xi \right] \\
-&= -\frac{1}{4} \left[ 2\int_{-1}^1 (1-\eta^2) d\eta + 2\int_{-1}^1  (1-\xi^2) d\xi \right] \\
-&= -\frac{1}{2} \left[ \frac{4}{3} + \frac{4}{3} \right] \\
-&= -\frac{1}{2} \cdot \frac{8}{3} \\
-&= -\frac{4}{3} \\
-&= \frac{4}{6} \cdot (-2)
+    \int_{-1}^{1} \int_{-1}^{1} \nabla \Phi_0 \cdot \nabla \Phi_2 \ d\xi d\eta &= \int_{-1}^{1} \int_{-1}^{1} -\frac{1}{w^2}(1-\eta)(1+\eta) - \frac{1}{h^2}(1-\xi)(1+\xi) \ d\xi d\eta \\
+&= -\frac{1}{w^2} \int_{-1}^1 \int_{-1}^1 (1-\eta^2) \ d\xi d\eta - \frac{1}{h^2} \int_{-1}^1 \int_{-1}^1 (1-\xi^2) \ d\xi d\eta \\
+&= -\frac{2}{w^2} \int_{-1}^1 (1-\eta^2) \ d\eta - \frac{2}{h^2}\int_{-1}^1 (1-\xi^2) \ d\xi \\
+&= -\frac{2}{w^2} \cdot \frac{4}{3} - \frac{2}{h^2} \cdot \frac{4}{3}\\
+&= -\frac{8}{3w^2} - \frac{8}{3h^2}\\
+&= -\frac{8}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right)
 \end{align*}
 
-Case: Third Off-Diagonal entry ($i=0, j=3$):
+Now let us compute the unique elemental and stiffness matrices for our mesh using our formulas above.
 
-Same as First Off-Diagonal, so the result is $-\frac{4}{6}$.
+There will be 3 unique element mass matrices for the following combinations of width $w=(x_1 - x_0)$ and height $h=(y_2 - y_1)$:
+\begin{enumerate}
+    \item Element with width $0.4$ and height $0.4$
+    \item Element with width $0.4$ and height $2.8$ or vice versa
+    \item Element with width $2.8$ and height $2.8$
+\end{enumerate}
 
-Substituting all these results back into the integral matrix, we have:
-\[\int_{-1}^{1} \int_{-1}^{1} \nabla \Phi \cdot \nabla \Phi^T \ d\xi d\eta = 
-\frac{4}{6}
+Case 1: Element with width $0.4$ and height $0.4$
+\[M^{(e)} = \frac{(\frac{2}{5})^2}{4} \cdot \frac{1}{9}
 \begin{bmatrix}
-4 & -1 & -2 & -1 \\
--1 & 4 & -1 & -2 \\
--2 & -1 & 4 & -1 \\
--1 & -2 & -1 & 4
+4 & 2 & 1 & 2 \\
+2 & 4 & 2 & 1 \\
+1 & 2 & 4 & 2 \\
+2 & 1 & 2 & 4
+\end{bmatrix} = \frac{1}{225}
+\begin{bmatrix}
+4 & 2 & 1 & 2 \\
+2 & 4 & 2 & 1 \\
+1 & 2 & 4 & 2 \\
+2 & 1 & 2 & 4
 \end{bmatrix}\]
 
-Therefore, the elemental stiffness matrix is:
-\[K^{(e)} = \frac{|x_1 - x_0| \cdot |y_2 - y_1|}{4} \cdot \frac{4}{6}
+Case 2: Element with width $0.4$ and height $2.8$
+\[M^{(e)} = \frac{(\frac{2}{5}) \cdot (\frac{14}{5})}{4} \cdot \frac{1}{9}
 \begin{bmatrix}
-4 & -1 & -2 & -1 \\
--1 & 4 & -1 & -2 \\
--2 & -1 & 4 & -1 \\
--1 & -2 & -1 & 4
+4 & 2 & 1 & 2 \\
+2 & 4 & 2 & 1 \\
+1 & 2 & 4 & 2 \\
+2 & 1 & 2 & 4
+\end{bmatrix} = \frac{7}{225}
+\begin{bmatrix}
+4 & 2 & 1 & 2 \\
+2 & 4 & 2 & 1 \\
+1 & 2 & 4 & 2 \\
+2 & 1 & 2 & 4
 \end{bmatrix}\]
 
-For our mesh, where all the elements are of side length $1$, we have:
+Case 3: Element with width $2.8$ and height $2.8$
+\[M^{(e)} = \frac{(\frac{14}{5})^2}{4} \cdot \frac{1}{9}
+\begin{bmatrix}
+4 & 2 & 1 & 2 \\
+2 & 4 & 2 & 1 \\
+1 & 2 & 4 & 2 \\
+2 & 1 & 2 & 4
+\end{bmatrix} = \frac{49}{225}
+\begin{bmatrix}
+4 & 2 & 1 & 2 \\
+2 & 4 & 2 & 1 \\
+1 & 2 & 4 & 2 \\
+2 & 1 & 2 & 4
+\end{bmatrix}\]
+
+There will be 3 unique element stiffness matrices for the following combinations of width $w=(x_1 - x_0)$ and height $h=(y_2 - y_1)$:
+\begin{enumerate}
+    \item Square element with width $0.4$ and height $0.4$ or width $2.8$ and height $2.8$
+    \item Element with width $0.4$ and height $2.8$
+    \item Element with width $2.8$ and height $0.4$
+\end{enumerate}
+
+\underbar{Case 1: Square element (ex. width $0.4$ and height $0.4$)}
+
+Main diagonal entry:
+\[\frac{ |w| \cdot |h|}{16} \cdot \frac{16}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right) = \frac{(\frac{2}{5})^2}{16} \cdot \frac{16}{3} \left(\frac{1}{(\frac{2}{5})^2} + \frac{1}{(\frac{2}{5})^2}\right)= \frac{2}{3} = \frac{4}{6}\]
+Skew diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot \frac{8}{3} \left(\frac{1}{w^2} - \frac{2}{h^2}\right) = \frac{(\frac{2}{5})^2}{16} \cdot \frac{8}{3} \left(\frac{1}{(\frac{2}{5})^2} - \frac{2}{(\frac{2}{5})^2}\right)= -\frac{1}{6}\]
+First off-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot -\frac{8}{3} \left(\frac{2}{w^2} - \frac{1}{h^2}\right) = \frac{(\frac{2}{5})^2}{16} \cdot -\frac{8}{3} \left(\frac{2}{(\frac{2}{5})^2} - \frac{1}{(\frac{2}{5})^2}\right)= -\frac{1}{6}\]
+Second off-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot -\frac{8}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right) = \frac{(\frac{2}{5})^2}{16} \cdot -\frac{8}{3} \left(\frac{1}{(\frac{2}{5})^2} + \frac{1}{(\frac{2}{5})^2}\right)= -\frac{1}{3} = -\frac{2}{6}\]
+
+Therefore the elemental stiffness matrix is:
 \[K^{(e)} = \frac{1}{6}
 \begin{bmatrix}
 4 & -1 & -2 & -1 \\
@@ -572,31 +616,72 @@ For our mesh, where all the elements are of side length $1$, we have:
 -2 & -1 & 4 & -1 \\
 -1 & -2 & -1 & 4
 \end{bmatrix}\]
-Note that our elemental matrices would differ based on the mesh construction due to definition of the Jacobian.
+
+\underbar{Case 2: Element with width $0.4$ and height $2.8$}
+
+Main diagonal entry:
+\[\frac{ |w| \cdot |h|}{16} \cdot \frac{16}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right) = \frac{(\frac{2}{5}) \cdot (\frac{14}{5})}{16} \cdot \frac{16}{3} \left(\frac{1}{(\frac{2}{5})^2} + \frac{1}{(\frac{14}{5})^2}\right)= \frac{50}{21}=\frac{100}{42}\]
+Skew-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot \frac{8}{3} \left(\frac{1}{w^2} - \frac{2}{h^2}\right) = \frac{(\frac{2}{5}) \cdot (\frac{14}{5})}{16} \cdot \frac{8}{3} \left(\frac{1}{(\frac{2}{5})^2} - \frac{2}{(\frac{14}{5})^2}\right)= \frac{47}{42}\]
+First off-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot -\frac{8}{3} \left(\frac{2}{w^2} - \frac{1}{h^2}\right) = \frac{(\frac{2}{5}) \cdot (\frac{3}{5})}{16} \cdot -\frac{8}{3} \left(\frac{2}{(\frac{2}{5})^2} - \frac{1}{(\frac{14}{5})^2}\right)= -\frac{97}{42}\]
+Second off-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot -\frac{8}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right) = \frac{(\frac{2}{5}) \cdot (\frac{3}{5})}{16} \cdot -\frac{8}{3} \left(\frac{1}{(\frac{2}{5})^2} + \frac{1}{(\frac{14}{5})^2}\right)= -\frac{25}{21}=-\frac{50}{42}\]
+
+Therefore the elemental stiffness matrix is:
+\[K^{(e)} = \frac{1}{42}
+\begin{bmatrix}
+100 & -97 & -50 & 47 \\
+-97 & 100 & 47 & -50 \\
+-50 & 47 & 100 & -97 \\
+47 & -50 & -97 & 100
+\end{bmatrix}\]
+
+\underbar{Case 3: Element with width $2.8$ and height $0.4$}
+
+Main diagonal entry:
+\[\frac{ |w| \cdot |h|}{16} \cdot \frac{16}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right) = \frac{(\frac{14}{5}) \cdot (\frac{2}{5})}{16} \cdot \frac{16}{3} \left(\frac{1}{(\frac{14}{5})^2} + \frac{1}{(\frac{2}{5})^2}\right)= \frac{50}{21}=\frac{100}{42}\]
+Skew-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot \frac{8}{3} \left(\frac{1}{w^2} - \frac{2}{h^2}\right) = \frac{(\frac{14}{5}) \cdot (\frac{2}{5})}{16} \cdot \frac{8}{3} \left(\frac{1}{(\frac{14}{5})^2} - \frac{2}{(\frac{2}{5})^2}\right)= -\frac{97}{42}\]
+First off-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot -\frac{8}{3} \left(\frac{2}{w^2} - \frac{1}{h^2}\right) = \frac{(\frac{14}{5}) \cdot (\frac{2}{5})}{16} \cdot -\frac{8}{3} \left(\frac{2}{(\frac{14}{5})^2} - \frac{1}{(\frac{2}{5})^2}\right) = \frac{47}{42}\]
+Second off-diagonal entry:
+\[\frac{|w|\cdot |h|}{16} \cdot -\frac{8}{3} \left(\frac{1}{w^2} + \frac{1}{h^2}\right) = \frac{(\frac{14}{5}) \cdot (\frac{2}{5})}{16} \cdot -\frac{8}{3} \left(\frac{1}{(\frac{14}{5})^2} + \frac{1}{(\frac{2}{5})^2}\right)= -\frac{25}{21}=-\frac{50}{42}\]
+
+Therefore the elemental stiffness matrix is:
+\[K^{(e)} = \frac{1}{42}
+\begin{bmatrix}
+100 & 47 & -50 & -97 \\
+47 & 100 & -97 & -50 \\
+-50 & -97 & 100 & 47 \\
+-97 & -50 & 47 & 100
+\end{bmatrix}\]
 
 \question
 Assemble the global mass matrix $M$ and global stiffness matrix $K$ for the entire $2 \times 2$ mesh using the connectivity determined in question 2. Impose homogeneous Dirichlet boundary conditions on all boundary nodes. Write the resulting discretized ODE system in the following format:
 \[M \frac{dU}{dt} + KU = F(t)\]
 
 \solution
-Given the Dirichlet boundary conditions on all boundary nodes, we only need to consider the interior nodes for our global matrices, therefore our mesh is reduced to $2 \times 2$ rectangles, for a total of $4$ rectangular elements. From our initial global indexing, we reduce the problem to have $9$ interior nodes, numbered from $0$ to $8$. We'll also number our elements from $0$ to $3$ in a row-wise manner:
+% Given the Dirichlet boundary conditions on all boundary nodes, we only need to consider the interior nodes for our global matrices, therefore our mesh is reduced to $2 \times 2$ rectangles, for a total of $4$ rectangular elements. From our initial global indexing, we reduce the problem to have $9$ interior nodes, numbered from $0$ to $8$. We'll also number our elements from $0$ to $3$ in a row-wise manner:
 
-\begin{center}
-\includegraphics[width=.75\textwidth]{updated_mesh.jpg}
-\end{center}
+% \begin{center}
+% \includegraphics[width=.75\textwidth]{updated_mesh.jpg}
+% \end{center}
 
-Using the python method defined in question 2, the updated connectivities for each element are as follows:
+% Note that after eliminating the boundary nodes, we just have a uniform mesh of $0.4 \times 0.4$ squares.
 
-\begin{center}
-\begin{tabular}{c|c c c c}
-Element & Node 0 & Node 1 & Node 2 & Node 3 \\
-\hline
-0 & 3 & 4 & 1 & 0 \\
-1 & 4 & 5 & 2 & 1 \\
-2 & 6 & 7 & 4 & 3 \\
-3 & 7 & 8 & 5 & 4\\
-\end{tabular}
-\end{center}
+% Using the python method defined in question 2, the updated connectivities for each element are as follows:
+
+% \begin{center}
+% \begin{tabular}{c|c c c c}
+% Element & Node 0 & Node 1 & Node 2 & Node 3 \\
+% \hline
+% 0 & 3 & 4 & 1 & 0 \\
+% 1 & 4 & 5 & 2 & 1 \\
+% 2 & 6 & 7 & 4 & 3 \\
+% 3 & 7 & 8 & 5 & 4\\
+% \end{tabular}
+% \end{center}
 
 We will adjust the indexing in the preliminary setup to match this scenario. From before we had:
 \[\sum_{i,j=1}^{N} \left( \int_{\Omega} \Phi_i \Phi_j \ dx \right) \frac{dU_i}{dt} + \nu \sum_{i,j=1}^{N}  \left( \int_{\Omega} \nabla \Phi_i \cdot \nabla \Phi_j \ dx \right) U_i = \sum_{j=1}^{N}\int_{\Omega} f \Phi_j \ dx\] 
@@ -605,9 +690,9 @@ Was our global discretized system, where $N$ is the total number of nodes. Rewri
 Where $E$ is the total number of elements.
 
 Correcting for our indexing scheme, we have:
-\[\left(\sum_{e=0}^{3} M^{(e)} \right) \frac{dU}{dt} + \nu \left(\sum_{e=0}^{3} K^{(e)}\right) U = \sum_{e=0}^{3} F^{(e)}(t)\]
+\[\left(\sum_{e=0}^{15} M^{(e)} \right) \frac{dU}{dt} + \nu \left(\sum_{e=0}^{15} K^{(e)}\right) U = \sum_{e=0}^{15} F^{(e)}(t)\]
 
-Such that that $M = \sum_{e=0}^{3} M^{(e)}$ and $K = \sum_{e=0}^{3} K^{(e)}$. We could lump the $\nu$ into $K$ to get the form:
+Such that that $M = \sum_{e=0}^{15} M^{(e)}$ and $K = \sum_{e=0}^{15} K^{(e)}$. We could lump the $\nu$ into $K$ to get the form:
 \[M \frac{dU}{dt} + K U = F(t)\]
 Also, since we have the homogeneous heat equation, $F^{(e)}(t) = 0$ for all $e$.
 
@@ -616,113 +701,135 @@ In addition to methods defined in Question 2, the following code was used to ass
 import numpy as np
 import sympy as sp
 
-def det_jacobian(xe, ye):
-    return (1/4) * abs(xe[1] - xe[0]) * abs(ye[2] - ye[1])
-
-def element_mass_matrix(xe, ye):
-    detJ = det_jacobian(xe, ye)
-    Me = (detJ / 9) * np.array([[4, 2, 1, 2],
-                                 [2, 4, 2, 1],
-                                 [1, 2, 4, 2],
-                                 [2, 1, 2, 4]])
+def element_mass_matrix(w, h):
+    area = w * h
+    Me = (area/36) * np.array([[4, 2, 1, 2],
+                               [2, 4, 2, 1],
+                               [1, 2, 4, 2],
+                               [2, 1, 2, 4]])
     return Me
 
-def element_stiffness_matrix(xe, ye):
-    detJ = det_jacobian(xe, ye)
-    Ke = detJ *(4 / 6) * np.array([[4, -1, -2, -1],
-                                 [-1, 4, -1, -2],
-                                 [-2, -1, 4, -1],
-                                 [-1, -2, -1, 4]])
+def element_stiffness_matrix(w, h):
+    # When multiplying each entry formula by w * h /16, we get the following reduced formulas:
+    wh = w/h
+    hw = h/w
+    # Main diagonal
+    a = (1/3) * (hw + wh)
+    # Skew diagonal
+    b = (1/6) * (hw - 2*wh)
+    # First off-diagonal
+    c = -(1/6) * (2*hw - wh)
+    # Second off-diagonal
+    d = -(1/6) * (hw + wh)
+    # Construct element stiffness matrix
+    Ke = np.array([[a, c, d, b],
+                   [c, a, b, d],
+                   [d, b, a, c],
+                   [b, d, c, a]])
     return Ke
 
-def generate_global_coordinates(width, height=None):
-    if height is None:
-        height = width
-    
-    # Generate global coordinates for interior nodes
-    # given Dirichlet BCs
-    x_nodes = np.linspace(-2, 2, width)
-    x_nodes = x_nodes[1:-1]
-    y_nodes = np.linspace(-2, 2, height)
-    y_nodes = y_nodes[1:-1]
-
-    # Create meshgrid of coordinates
-    x_mesh, y_mesh = np.array(np.meshgrid(x_nodes, y_nodes))
-    # Reshape as list of (x, y) pairs
-    global_coordinates = np.column_stack((x_mesh.ravel(), y_mesh.ravel()))
+def generate_global_coordinates(x_nodes, y_nodes=None):
+    if y_nodes is None:
+        y_nodes = x_nodes
+        
+    y_nodes = y_nodes[::-1]
+    global_coordinates = []
+    for y in y_nodes:
+        for x in x_nodes:
+            global_coordinates.append([x, y])
+    global_coordinates = np.array(global_coordinates)
     return global_coordinates
 
 
-def global_assembly(width, height=None, nu=0.05):
-    if height is None:
-        height = width
+def global_assembly(x_nodes, y_nodes=None):
+    if y_nodes is None:
+        y_nodes = x_nodes
         
-    global_coordinates = generate_global_coordinates(width, height)
+    global_coordinates = generate_global_coordinates(x_nodes, y_nodes)
     
+    width = len(x_nodes)
+    height = len(y_nodes)
+
     global_indices = global_indexing(width, height)
     connectivity_matrix = generate_connectivity_matrix(global_indices)
 
-    num_nodes = (width - 2) * (height - 2)
+    num_nodes = width * height
     M_global = np.zeros((num_nodes, num_nodes))
     K_global = np.zeros((num_nodes, num_nodes))
     
-    for element in range(connectivity_matrix.shape[0]):
-        # Get the global node indices for this element
-        element_coordinates = connectivity_matrix[element, :]
+    for element in connectivity_matrix:
         
-        # Extract x and y coordinates for element
-        # x coordinates
-        xe = global_coordinates[element_coordinates, 0]  
-        # y coordinates
-        ye = global_coordinates[element_coordinates, 1] 
-        
-        # Compute element matrices
-        Me = element_mass_matrix(xe, ye)
-        Ke = element_stiffness_matrix(xe, ye)
-        
+        # Bottom-left (node 0)
+        x0 = global_coordinates[element[0], 0]
+        y0 = global_coordinates[element[0], 1]
+
+        # Bottom-right (node 1)
+        x1 = global_coordinates[element[1], 0]
+
+        # Top-left (node 3)
+        y3 = global_coordinates[element[3], 1]
+
+        # Element width and height
+        w = abs(x1 - x0)
+        h = abs(y3 - y0)
+
+        # Get element matrices
+        Me = element_mass_matrix(w, h)
+        Ke = element_stiffness_matrix(w, h)
+
         # Add element contributions to global matrices
         for i_local in range(4):
-            i_global = element_coordinates[i_local]
+            i_global = element[i_local]
             for j_local in range(4):
-                j_global = element_coordinates[j_local]
+                j_global = element[j_local]
                 M_global[i_global, j_global] += Me[i_local, j_local]
                 K_global[i_global, j_global] += Ke[i_local, j_local]
     
-    return M_global, K_global
+    return global_coordinates, M_global, K_global
 
 if __name__ == "__main__":
-    width = 5  # Number of nodes along one dimension
-    global_indices = global_indexing(width)
-    connectivity_matrix = generate_connectivity_matrix(global_indices)
-    M, K = global_assembly(width)
+    x_nodes = np.array([-2, -1.6, -1.2, -0.8, 2])
+    _, M, K = global_assembly(x_nodes)
 
     with open("./outputs_4/matrices.txt", "w") as f:
-        print(global_indices)
-        latex_matrix = sp.latex(sp.Matrix(global_indices))
-        f.write("Global Indices Matrix:\n")
-        f.write(latex_matrix + "\n\n")
-        
-        print(connectivity_matrix)
-        latex_matrix = sp.latex(sp.Matrix(connectivity_matrix))
-        f.write("Connectivity Matrix:\n")
-        f.write(latex_matrix + "\n\n")
-
         M = np.round(M, 4)
-        latex_matrix = sp.latex(sp.Matrix(M))
-        f.write("Mass Matrix:\n")
-        f.write(latex_matrix + "\n\n")
+        M_split = np.array_split(M, 3, axis=1)
+        latex_1_matrix = sp.latex(sp.Matrix(M_split[0]))
+        latex_2_matrix = sp.latex(sp.Matrix(M_split[1]))
+        latex_3_matrix = sp.latex(sp.Matrix(M_split[2]))
+        f.write("Mass Matrix (Part 1):\n")
+        f.write(latex_1_matrix + "\n\n")
+        f.write("Mass Matrix (Part 2):\n")
+        f.write(latex_2_matrix + "\n\n")
+        f.write("Mass Matrix (Part 3):\n")
+        f.write(latex_3_matrix + "\n\n")
 
         K = np.round(K, 4)
-        latex_matrix = sp.latex(sp.Matrix(K))
-        f.write("Stiffness Matrix:\n")
-        f.write(latex_matrix + "\n\n")
+        K_split = np.array_split(K, 3, axis=1)
+        latex_1_matrix = sp.latex(sp.Matrix(K_split[0]))
+        latex_2_matrix = sp.latex(sp.Matrix(K_split[1]))
+        latex_3_matrix = sp.latex(sp.Matrix(K_split[2]))
+        f.write("Stiffness Matrix (Part 1):\n")
+        f.write(latex_1_matrix + "\n\n")
+        f.write("Stiffness Matrix (Part 2):\n")
+        f.write(latex_2_matrix + "\n\n")
+        f.write("Stiffness Matrix (Part 3):\n")
+        f.write(latex_3_matrix + "\n\n")
 \end{lstlisting}
 
-Our mass matrix $M$ will be of size $9 \times 9$ and was found to be:
-\[\left[\begin{matrix}0.1111 & 0.0556 & 0.0 & 0.0556 & 0.0278 & 0.0 & 0.0 & 0.0 & 0.0\\0.0556 & 0.2222 & 0.0556 & 0.0278 & 0.1111 & 0.0278 & 0.0 & 0.0 & 0.0\\0.0 & 0.0556 & 0.1111 & 0.0 & 0.0278 & 0.0556 & 0.0 & 0.0 & 0.0\\0.0556 & 0.0278 & 0.0 & 0.2222 & 0.1111 & 0.0 & 0.0556 & 0.0278 & 0.0\\0.0278 & 0.1111 & 0.0278 & 0.1111 & 0.4444 & 0.1111 & 0.0278 & 0.1111 & 0.0278\\0.0 & 0.0278 & 0.0556 & 0.0 & 0.1111 & 0.2222 & 0.0 & 0.0278 & 0.0556\\0.0 & 0.0 & 0.0 & 0.0556 & 0.0278 & 0.0 & 0.1111 & 0.0556 & 0.0\\0.0 & 0.0 & 0.0 & 0.0278 & 0.1111 & 0.0278 & 0.0556 & 0.2222 & 0.0556\\0.0 & 0.0 & 0.0 & 0.0 & 0.0278 & 0.0556 & 0.0 & 0.0556 & 0.1111\end{matrix}\right]\]
+The code was constructed such that non-uniform meshes of arbitrary widths and heights could be used.
 
-Our stiffness matrix $K$ will also be of size $9 \times 9$ and was found to be (without $\nu$):
-\[\left[\begin{matrix}0.6667 & -0.1667 & 0.0 & -0.1667 & -0.3333 & 0.0 & 0.0 & 0.0 & 0.0\\-0.1667 & 1.3333 & -0.1667 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & 0.0\\0.0 & -0.1667 & 0.6667 & 0.0 & -0.3333 & -0.1667 & 0.0 & 0.0 & 0.0\\-0.1667 & -0.3333 & 0.0 & 1.3333 & -0.3333 & 0.0 & -0.1667 & -0.3333 & 0.0\\-0.3333 & -0.3333 & -0.3333 & -0.3333 & 2.6667 & -0.3333 & -0.3333 & -0.3333 & -0.3333\\0.0 & -0.3333 & -0.1667 & 0.0 & -0.3333 & 1.3333 & 0.0 & -0.3333 & -0.1667\\0.0 & 0.0 & 0.0 & -0.1667 & -0.3333 & 0.0 & 0.6667 & -0.1667 & 0.0\\0.0 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & -0.1667 & 1.3333 & -0.1667\\0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -0.1667 & 0.0 & -0.1667 & 0.6667\end{matrix}\right]\]
+Our mass matrix $M$ will be of size $25 \times 25$ and was found to be:
+\[\left[\begin{matrix}0.1244 & 0.0622 & 0.0 & 0.0 & 0.0 & 0.0622 & 0.0311 & 0.0 & 0.0\\0.0622 & 0.2489 & 0.0622 & 0.0 & 0.0 & 0.0311 & 0.1244 & 0.0311 & 0.0\\0.0 & 0.0622 & 0.2489 & 0.0622 & 0.0 & 0.0 & 0.0311 & 0.1244 & 0.0311\\0.0 & 0.0 & 0.0622 & 0.9956 & 0.4356 & 0.0 & 0.0 & 0.0311 & 0.4978\\0.0 & 0.0 & 0.0 & 0.4356 & 0.8711 & 0.0 & 0.0 & 0.0 & 0.2178\\0.0622 & 0.0311 & 0.0 & 0.0 & 0.0 & 0.1422 & 0.0711 & 0.0 & 0.0\\0.0311 & 0.1244 & 0.0311 & 0.0 & 0.0 & 0.0711 & 0.2844 & 0.0711 & 0.0\\0.0 & 0.0311 & 0.1244 & 0.0311 & 0.0 & 0.0 & 0.0711 & 0.2844 & 0.0711\\0.0 & 0.0 & 0.0311 & 0.4978 & 0.2178 & 0.0 & 0.0 & 0.0711 & 1.1378\\0.0 & 0.0 & 0.0 & 0.2178 & 0.4356 & 0.0 & 0.0 & 0.0 & 0.4978\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0089 & 0.0044 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0711\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0311\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
+\[ \cdots \left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.2178 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.4356 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0089 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0\\0.4978 & 0.0 & 0.0 & 0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0\\0.9956 & 0.0 & 0.0 & 0.0 & 0.0311 & 0.0622 & 0.0 & 0.0\\0.0 & 0.0356 & 0.0178 & 0.0 & 0.0 & 0.0 & 0.0089 & 0.0044\\0.0 & 0.0178 & 0.0711 & 0.0178 & 0.0 & 0.0 & 0.0044 & 0.0178\\0.0 & 0.0 & 0.0178 & 0.0711 & 0.0178 & 0.0 & 0.0 & 0.0044\\0.0311 & 0.0 & 0.0 & 0.0178 & 0.2844 & 0.1244 & 0.0 & 0.0\\0.0622 & 0.0 & 0.0 & 0.0 & 0.1244 & 0.2489 & 0.0 & 0.0\\0.0 & 0.0089 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0356 & 0.0178\\0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0178 & 0.0711\\0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0178\\0.0 & 0.0 & 0.0 & 0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0311 & 0.0622 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0089 & 0.0044\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0178\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
+\[\cdots \left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0044 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0178 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0311 & 0.0622 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0089 & 0.0044 & 0.0 & 0.0 & 0.0\\0.0178 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0\\0.0711 & 0.0178 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0\\0.0178 & 0.2844 & 0.1244 & 0.0 & 0.0 & 0.0044 & 0.0711 & 0.0311\\0.0 & 0.1244 & 0.2489 & 0.0 & 0.0 & 0.0 & 0.0311 & 0.0622\\0.0 & 0.0 & 0.0 & 0.0178 & 0.0089 & 0.0 & 0.0 & 0.0\\0.0044 & 0.0 & 0.0 & 0.0089 & 0.0356 & 0.0089 & 0.0 & 0.0\\0.0178 & 0.0044 & 0.0 & 0.0 & 0.0089 & 0.0356 & 0.0089 & 0.0\\0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0 & 0.0089 & 0.1422 & 0.0622\\0.0 & 0.0311 & 0.0622 & 0.0 & 0.0 & 0.0 & 0.0622 & 0.1244\end{matrix}\right]\]
+
+\newpage
+
+Our stiffness matrix $K$ will also be of size $25 \times 25$ and was found to be (without $\nu$):
+\[\left[\begin{matrix}2.381 & -2.3095 & 0.0 & 0.0 & 0.0 & 1.119 & -1.1905 & 0.0 & 0.0\\-2.3095 & 4.7619 & -2.3095 & 0.0 & 0.0 & -1.1905 & 2.2381 & -1.1905 & 0.0\\0.0 & -2.3095 & 4.7619 & -2.3095 & 0.0 & 0.0 & -1.1905 & 2.2381 & -1.1905\\0.0 & 0.0 & -2.3095 & 3.0476 & -0.1667 & 0.0 & 0.0 & -1.1905 & 0.9524\\0.0 & 0.0 & 0.0 & -0.1667 & 0.6667 & 0.0 & 0.0 & 0.0 & -0.3333\\1.119 & -1.1905 & 0.0 & 0.0 & 0.0 & 3.0476 & -2.4762 & 0.0 & 0.0\\-1.1905 & 2.2381 & -1.1905 & 0.0 & 0.0 & -2.4762 & 6.0952 & -2.4762 & 0.0\\0.0 & -1.1905 & 2.2381 & -1.1905 & 0.0 & 0.0 & -2.4762 & 6.0952 & -2.4762\\0.0 & 0.0 & -1.1905 & 0.9524 & -0.3333 & 0.0 & 0.0 & -2.4762 & 6.0952\\0.0 & 0.0 & 0.0 & -0.3333 & -0.1667 & 0.0 & 0.0 & 0.0 & 0.9524\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.1667 & -0.3333 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -2.4762\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -1.1905\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
+\[\cdots \left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.1667 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & -0.1667 & -0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & 0.0\\0.9524 & 0.0 & 0.0 & -0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0\\3.0476 & 0.0 & 0.0 & 0.0 & -1.1905 & -2.3095 & 0.0 & 0.0\\0.0 & 1.3333 & -0.3333 & 0.0 & 0.0 & 0.0 & -0.1667 & -0.3333\\0.0 & -0.3333 & 2.6667 & -0.3333 & 0.0 & 0.0 & -0.3333 & -0.3333\\0.0 & 0.0 & -0.3333 & 2.6667 & -0.3333 & 0.0 & 0.0 & -0.3333\\-1.1905 & 0.0 & 0.0 & -0.3333 & 6.0952 & 2.2381 & 0.0 & 0.0\\-2.3095 & 0.0 & 0.0 & 0.0 & 2.2381 & 4.7619 & 0.0 & 0.0\\0.0 & -0.1667 & -0.3333 & 0.0 & 0.0 & 0.0 & 1.3333 & -0.3333\\0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & -0.3333 & 2.6667\\0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & -0.3333\\0.0 & 0.0 & 0.0 & -0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & -1.1905 & -2.3095 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.1667 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
+\[\left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & -0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & -1.1905 & -2.3095 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & -0.1667 & -0.3333 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0\\2.6667 & -0.3333 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0\\-0.3333 & 6.0952 & 2.2381 & 0.0 & 0.0 & -0.3333 & -2.4762 & -1.1905\\0.0 & 2.2381 & 4.7619 & 0.0 & 0.0 & 0.0 & -1.1905 & -2.3095\\0.0 & 0.0 & 0.0 & 0.6667 & -0.1667 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & -0.1667 & 1.3333 & -0.1667 & 0.0 & 0.0\\-0.3333 & -0.3333 & 0.0 & 0.0 & -0.1667 & 1.3333 & -0.1667 & 0.0\\-0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0 & -0.1667 & 3.0476 & 1.119\\0.0 & -1.1905 & -2.3095 & 0.0 & 0.0 & 0.0 & 1.119 & 2.381\end{matrix}\right]\cdots\]
 
 As expected, both $M$ and $K$ are symmetric, banded matrices.
 
@@ -737,66 +844,235 @@ Given our system:
 We can rearrange this to get:
 \[\frac{dU}{dt} = -\nu M^{-1}K U\]
 
-{\large \textbf{Explicit: Forward Euler}}\\
-Let us find $U^{n+1}$ explicitly using forward difference in time:
-\[\frac{U^{n+1} - U^{n}}{\Delta t} = -\nu M^{-1}K U^{n}\]
-\[U^{n+1} = U^{n} - \nu \Delta t  M^{-1}K U^{n}\]
-Now let us derive the CFL condition for stability. Note that we may rewrite our scheme above as:
-\[U^{n+1} = \left( I - \nu \Delta t M^{-1}K \right) U^{n}\]
-Let $A = M^{-1}K$ and $B = I - \nu \Delta t A$. For stability, we require that the spectral radius of $B$ be less than or equal to $1$:
-\[\rho(B) = \max{|\lambda(B)|} \leq 1\]
-Where the maximum is taken over all eigenvalues $\lambda$ of $B$. Note that each eigenvalue of $B$ are related to a corresponding eigenvalue of $A$ as follows:
-\[\lambda(B) = 1 - \nu \Delta t \lambda(A)\]
-Therefore, we require:
-\[\max{|1 - \nu \Delta t \lambda(A)|} \leq 1\]
-Which implies that for all eigenvalues $\lambda(A)$:
-\[|1 - \nu \Delta t \lambda(A)| \leq 1\]
-We note that $A = M^{-1}K$ is positive definite (has real, positive eigenvalues). Through a quick check using Python, the list of eigenvalues of $A$ are:
-\[\left[\begin{matrix}24.0\\1.17981541490574 \cdot 10^{-15}\\3.0\\6.0\\15.0\\12.0\\3.0\\12.0\\15.0\end{matrix}\right]\]
-Note that $\rho(A) = 24$. 
+{\large \textbf{Implicit: Backward Euler}}\\
+Let us find $U^{n+1}$ implicitly using backward difference in time:
+\[\frac{U^{n+1} - U^{n}}{\Delta t} = -\nu M^{-1}K U^{n+1}\]
+Rearranging for $U^{n+1}$, we have:
+\[\left( I + \nu \Delta t M^{-1}K \right) U^{n+1} = U^{n}\]
 
-So given that all eigenvalues of $A$ are non-negative, to satisfy our stability condition, we require:
-\[|1 - \nu \Delta t \lambda(A)| \leq 1\]
-Which implies:
-\[ -1 \leq 1 - \nu \Delta t \lambda(A) \leq 1\]
-We may bound these inequalities separately. The right inequality simplifies to:
-\[0 \leq \nu \Delta t \lambda(A)\]
-Rearranging for $\Delta t$, we have:
-\[\Delta t \geq 0\]
-Which is vacuously true as heat is unstable in backwards time. The left inequality simplifies to:
-\[-2 \leq - \nu \Delta t \lambda(A)\]
-Rearranging for $\Delta t$, we have:
-\[\Delta t \leq \frac{2}{\nu \lambda(A)}\]
-To satisfy this for all eigenvalues of $A$, we use the maximum eigenvalue of A $\lambda_{max}(A) = 24$:
-\[\Delta t \leq \frac{2}{\nu \lambda_{max}(A)} = \frac{2}{0.05 \cdot 24} = \frac{5}{3} \approx 1.6667\]
-Therefore we may use the explicit scheme so long as $\Delta t \leq \frac{5}{3}$ for stability.
+The following code was used to implement the implicit backward Euler method:
+\begin{lstlisting}[language=Python, caption={implicit\_euler.py}]
+import numpy as np
+def classify_boundary_nodes(global_indexing):
+    # Create a boundary indicator array where 1 indicates a boundary node
+    boundary_indicator = np.zeros_like(global_indexing)
+    boundary_indicator[0, :] = 1  # Top boundary
+    boundary_indicator[-1, :] = 1  # Bottom boundary
+    boundary_indicator[:, 0] = 1  # Left boundary
+    boundary_indicator[:, -1] = 1  # Right boundary
+    return boundary_indicator.flatten()
 
-The following code was used to implement the explicit forward Euler method:
-\lstinputlisting[language=Python, caption={explicit\_solver.py}]{../explicit_solver.py}
+def implement_dirichlet_bc(M, K,boundary_indicator):
+    num_nodes = M.shape[0]
+    for i in range(num_nodes):
+        if boundary_indicator[i] == 1:
+            M[i, :] = 0
+            M[:, i] = 0
+            M[i, i] = 1
+            K[i, :] = 0
+            K[:, i] = 0
+            K[i, i] = 1
+    return M, K
 
-{\large \textbf{Semi-Implicit: Crank-Nicolson Method}}\\
-Let us use Crank-Nicolson method to solve this system.
+def u_0(coordinates, boundary_indicator):
+    x = coordinates[:, 0]
+    y = coordinates[:, 1]
+    u = np.sin(2*np.pi*x) * np.sin(2*np.pi*y)
+    u[boundary_indicator == 1] = 0.0  # Apply Dirichlet BCs
+    num_nodes = coordinates.shape[0]
+    return u.reshape((num_nodes,1))
 
-The forward Euler step is:
-\[M\frac{U^{n+1}-U^{n}}{\Delta t} = F^{n}(U) = -K U^{n}\]
-The backward Euler step is:
-\[ M \frac{U^{n+1}-U^{n}}{\Delta t} = F^{n+1}(U) = -K U^{n+1}\]
-Using Crank-Nicolson, we average these two steps:
-\[M\frac{U^{n+1}-U^{n}}{\Delta t} = \frac{1}{2} \left( F^{n}(U) + F^{n+1}(U) \right) = -\frac{1}{2} K \left( U^n + U^{n+1} \right)\]
-Rearranging, we have:
-\[M( U^{n+1}-U^{n}) = -\frac{\Delta t}{2} K \left( U^n + U^{n+1} \right)\]
-\[\left( M + \frac{\Delta t}{2} K \right) U^{n+1} = \left( M - \frac{\Delta t}{2} K \right) U^{n}\]
+def implicit_heat_solver(x_nodes, dt, t_final, nu=0.05):
+    global_coordinates, M, K = global_assembly(x_nodes)
+    width = len(x_nodes)
+    global_indexing_array = global_indexing(width)
+    boundary_indicator = classify_boundary_nodes(global_indexing_array)
+
+    M, K = implement_dirichlet_bc(M, K, boundary_indicator)
+
+    A = M + nu * dt * K
+
+    num_time_steps = math.ceil(t_final / dt)
+    dt = t_final / num_time_steps
+    prev_U = u_0(global_coordinates, boundary_indicator)
+    U = np.array([prev_U])
+
+    for n in range(num_time_steps):
+        b = np.matmul(M, U[n])
+        next_U = np.linalg.solve(A, b)
+        U = np.append(U, [next_U], axis=0)
+
+    return boundary_indicator, U.T, global_coordinates
+\end{lstlisting}
+
+% {\large \textbf{Explicit: Forward Euler}}\\
+% Let us find $U^{n+1}$ explicitly using forward difference in time:
+% \[\frac{U^{n+1} - U^{n}}{\Delta t} = -\nu M^{-1}K U^{n}\]
+% \[U^{n+1} = U^{n} - \nu \Delta t  M^{-1}K U^{n}\]
+% Now let us derive the CFL condition for stability. Note that we may rewrite our scheme above as:
+% \[U^{n+1} = \left( I - \nu \Delta t M^{-1}K \right) U^{n}\]
+% Let $A = M^{-1}K$ and $B = I - \nu \Delta t A$. For stability, we require that the spectral radius of $B$ be less than or equal to $1$:
+% \[\rho(B) = \max{|\lambda(B)|} \leq 1\]
+% Where the maximum is taken over all eigenvalues $\lambda$ of $B$. Note that each eigenvalue of $B$ are related to a corresponding eigenvalue of $A$ as follows:
+% \[\lambda(B) = 1 - \nu \Delta t \lambda(A)\]
+% Therefore, we require:
+% \[\max{|1 - \nu \Delta t \lambda(A)|} \leq 1\]
+% Which implies that for all eigenvalues $\lambda(A)$:
+% \[|1 - \nu \Delta t \lambda(A)| \leq 1\]
+% We note that $A = M^{-1}K$ is positive definite (has real, positive eigenvalues). Through a quick check using Python, the list of eigenvalues of $A$ are:
+% \[\left[\begin{matrix}99.0957972863707\\81.977552717751\\74.7950951752844\\67.8888200893627\\66.3058291088138\\63.140243950021\\54.7382970143386\\52.9310877926608\\41.2026015834527\\38.4344126719629\\30.226190606167\\0.300029340865063\\1.03236207797582\\2.59862823326611\\3.72281300903219\\4.42896938702106\\8.35072533895375\\6.93748466266246\\6.18063006268413\\14.4141025874919\\24.9167794129844\\23.7108073593928\\21.7324990526149\\20.3824756422991\\20.4028257000323\end{matrix}\right]\]
+% Note that $\rho(A) = 100$.
+
+% So given that all eigenvalues of $A$ are non-negative, to satisfy our stability condition, we require:
+% \[|1 - \nu \Delta t \lambda(A)| \leq 1\]
+% Which implies:
+% \[ -1 \leq 1 - \nu \Delta t \lambda(A) \leq 1\]
+% We may bound these inequalities separately. The right inequality simplifies to:
+% \[0 \leq \nu \Delta t \lambda(A)\]
+% Rearranging for $\Delta t$, we have:
+% \[\Delta t \geq 0\]
+% Which is vacuously true as heat is unstable in backwards time. The left inequality simplifies to:
+% \[-2 \leq - \nu \Delta t \lambda(A)\]
+% Rearranging for $\Delta t$, we have:
+% \[\Delta t \leq \frac{2}{\nu \lambda(A)}\]
+% To satisfy this for all eigenvalues of $A$, we use the maximum eigenvalue of $A$ $\lambda_{max}(A) = 100$:
+% \[\Delta t \leq \frac{2}{\nu \lambda_{max}(A)} = \frac{2}{0.05 \cdot 100} = \frac{2}{5} = 0.4\]
+% Therefore we may use the explicit scheme so long as $\Delta t \leq 0.4$ for stability.
+
+% The following code was used to implement the explicit forward Euler method:
+% \lstinputlisting[language=Python, caption={explicit\_solver.py}]{../explicit_solver.py}
+
+% {\large \textbf{Semi-Implicit: Crank-Nicolson Method}}\\
+% Let us use Crank-Nicolson method to solve this system.
+
+% The forward Euler step is:
+% \[M\frac{U^{n+1}-U^{n}}{\Delta t} = F^{n}(U) = -\nu K U^{n}\]
+% The backward Euler step is:
+% \[ M \frac{U^{n+1}-U^{n}}{\Delta t} = F^{n+1}(U) = -\nu K U^{n+1}\]
+% Using Crank-Nicolson, we average these two steps:
+% \[M\frac{U^{n+1}-U^{n}}{\Delta t} = \frac{1}{2} \left( F^{n}(U) + F^{n+1}(U) \right) = -\frac{\nu}{2} K \left( U^n + U^{n+1} \right)\]
+% Rearranging, we have:
+% \[M( U^{n+1}-U^{n}) = -\nu \cdot\frac{\Delta t}{2} K \left( U^n + U^{n+1} \right)\]
+% \[\left( M + \nu \cdot\frac{\Delta t}{2} K \right) U^{n+1} = \left( M - \nu \cdot\frac{\Delta t}{2} K \right) U^{n}\]
+% We note that there are not any stability restrictions on $\Delta t$ for Crank-Nicolson, as it is unconditionally stable. However for numerical accuracy, we will still choose $\Delta t$ to be small.
+
+% The following code was used to implement the Crank-Nicolson method:
+% \begin{lstlisting}[language=Python, caption={Crank-Nicolson Method}]
+% from assembly import global_assembly
+% from explicit_solver import u_o
+% import numpy as np
+% import math
+
+% def crank_nicolson(width, height, T, dt):
+%     global_coordinates, M, K = global_assembly(width, height)
+%     num_nodes = M.shape[0]
+%     num_time_steps = math.ceil(T / dt)
+
+%     U = np.zeros((num_nodes, num_time_steps+1))
+%     U[:, 0] = u_o(global_coordinates[:, 0], global_coordinates[:, 1])
+
+%     A = M + (dt / 2) * K
+%     B = M - (dt / 2) * K
+
+%     for n in range(1, num_time_steps):
+%         b = np.dot(B, U[:, n])
+%         U[:, n] = jacobi(A, b, x0=U[:, n], tol=1e-12, max_iterations=5000)
+
+
+%     times = np.array([n * dt for n in range(num_time_steps)])
+
+%     return times, U.T
+% \end{lstlisting}
+
+% We note that the Jacobi implementation is defined in the next question.
 
 \question
 Write your own solver for solving linear systems. You can freely choose the methods from Gaussian, Jacobi, or Gauss-Seidel.
 \solution
-\emph{Extra: See Appendix for past Maple implementations of Gaussian Elimination, Jacobi, and Gauss-Seidel.}
+
+% We note that the both $M$ and $K$ are symmetric positive definite matrices. 
+% We can verify this by checking that all eigenvalues of both matrices are positive using Python. 
+
+% For $M$, the eigenvalues are:
+% \[\left[\begin{matrix}0.622008467928147\\0.0446581987385205\\0.070441621801729\\0.111111111111111\\0.262891711531605\\0.262891711531604\\0.166666666666667\\0.166666666666667\\0.070441621801729\end{matrix}\right]\]
+
+% For $K$, the eigenvalues are:
+% \[\left[\begin{matrix}3.0\\4.11094866217662 \cdot 10^{-17}\\1.40824829046386\\0.999999999999999\\0.591751709536136\\0.666666666666666\\2.0\\1.40824829046386\\0.591751709536137\end{matrix}\right]\]
+
+% Therefore $M$ and $K$ are indeed symmetric positive definite matrices. It follows that from Crank-Nicolson, the system to be solved at each time step is:
+% \[\left( M + \nu \cdot \frac{\Delta t}{2} K \right) U^{n+1} = \left( M - \nu \cdot \frac{\Delta t}{2} K \right) U^{n}\]
+% and the left-hand matrix is symmetric positive definite. We will the system as $Au=b$, where:
+% \[A = \left( M + \nu \cdot \frac{\Delta t}{2} K \right), \quad b = \left( M - \nu \cdot \frac{\Delta t}{2} K \right) U^{n}\]
+Jacobi is defined interatively as:
+\[x_{n+1} = D^{-1}( - R \cdot x_n +b)\]
+Where $D$ is the diagonal of $A$ and $R = A - D$ is the remainder matrix. 
+We will use an initial guess of $x_0 = 0$ and iterate until tolerance is met (with $l_{\infty}$ norm) or maximum iterations are reached.
+
+The following code was used to implement the Jacobi method:
+\lstinputlisting[language=Python, caption={Jacobi Method}]{../jacobi.py}
+
+\emph{\underbar{Extra}: See Appendix for past implementations of Gaussian Elimination, Jacobi, and Gauss-Seidel in Maple.}
 
 \question
 Perform a convergence study with different refinements on time steps. Plot the log-log plot of error vs time step size. 
 
+\solution
+The following code was used to perform the convergence study:
+\begin{lstlisting}[language=Python, caption={Convergence Study}]
+import numpy as np
+import matplotlib.pyplot as plt
+def convergence_study_timesteps(x_nodes, t_final, dt_values, y_nodes=None):
+    if y_nodes is None:
+        y_nodes = x_nodes
+    errors_implicit = []
+    global_coordinates, _, _ = global_assembly(x_nodes, y_nodes)
+    width = len(x_nodes)
+    global_indexing_array = global_indexing(width)
+    boundary = classify_boundary_nodes(global_indexing_array)
+    x_coords = global_coordinates[:, 0].reshape(width**2, 1)
+    y_coords = global_coordinates[:, 1].reshape(width**2, 1)
+    u_exact_values = u_exact(x_coords, y_coords, t_final, boundary)
+
+    for dt in dt_values:
+        _, U, _ = implicit_heat_solver(x_nodes, dt, t_final)
+        u_numerical_values = U[:, :, -1]
+        error = np.linalg.norm(u_numerical_values - u_exact_values, ord=2)
+        errors_implicit.append(error)
+
+    return errors_implicit
+
+if __name__ == "__main__":
+    # <some matplotlib styling and enable latex>
+    x_nodes = np.array([-2,-1.6,-1.2,-0.8,2])
+    t_final = 1
+    dt_values = np.logspace(-1, -10, 10, base=2)
+    errors_implicit = convergence_study_timesteps(x_nodes, t_final, dt_values)
+    fig, ax = plt.subplots(figsize=(9,6))
+    ax.loglog(dt_values, errors_implicit, marker='x', label='Implicit')
+    ax.set_xlabel(r'$\log(\Delta t)$')
+    ax.set_ylabel(r'$\log(||u - u_{exact}||_2)$')
+    ax.set_title('Convergence Study for Implicit Solver')
+    ax.legend()
+    fig.savefig("./outputs_4/implicit_convergence_study.png", dpi=300)
+\end{lstlisting}
+
+For efficiency, we use numpy's built in linear algebra. We get the resulting error plot below:
+
+\begin{center}
+    \includegraphics[width=0.7\textwidth]{../outputs_4/implicit_convergence_study.png}
+\end{center}
+
+We can see that with smaller time steps, the error decreases.
+
+
 \question
 Plot $U(t)$ at $T=1$.
+
+\solution
+The following plot was generated using the implicit solver at $t=1$:
+\begin{center}
+    \includegraphics[width=0.9\textwidth]{../outputs_4/implicit_solution.png}
+\end{center}
 
 \newpage
     \vspace{1em}
@@ -817,5 +1093,11 @@ Note: the Matrix Solver is Gaussian Elimination with addition of LU decompositio
 
 \section{Assignment Code}
 \startappendix
+
+\lstinputlisting[language=Python, caption={Assembly}]{../assembly.py}
+
+\lstinputlisting[language = Python, caption={Implicit Euler Method}]{../implicit_euler.py}
+
+\lstinputlisting[language = Python, caption={Jacobi Method}]{../jacobi.py}
 
 \end{document}

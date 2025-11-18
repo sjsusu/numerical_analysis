@@ -1,12 +1,11 @@
+from copy import deepcopy
 import numpy as np
 import sympy as sp
 
-def global_indexing(width, height=None, include_boundary=False):
+def global_indexing(width, height=None):
     if height is None:
         height = width
-    if include_boundary:
-        return np.arange(width * height).reshape((width, height))
-    return np.arange((width-2)*(height-2)).reshape((width-2, height-2))
+    return np.arange(width * height).reshape((height, width))
 
 def generate_connectivity_matrix(global_indices):
     total_elements = (global_indices.shape[0] - 1) * (global_indices.shape[1] - 1)
@@ -21,121 +20,191 @@ def generate_connectivity_matrix(global_indices):
             element += 1
     return connectivity_matrix
 
-def det_jacobian(xe, ye):
-    return (1/4) * abs(xe[1] - xe[0]) * abs(ye[2] - ye[1])
-
-def element_mass_matrix(xe, ye):
-    detJ = det_jacobian(xe, ye)
-    Me = (detJ / 9) * np.array([[4, 2, 1, 2],
-                                 [2, 4, 2, 1],
-                                 [1, 2, 4, 2],
-                                 [2, 1, 2, 4]])
+def element_mass_matrix(w, h):
+    area = w * h
+    Me = (area/36) * np.array([[4, 2, 1, 2],
+                               [2, 4, 2, 1],
+                               [1, 2, 4, 2],
+                               [2, 1, 2, 4]])
     return Me
 
-def element_stiffness_matrix(xe, ye):
-    detJ = det_jacobian(xe, ye)
-    Ke = detJ *(4 / 6) * np.array([[4, -1, -2, -1],
-                                 [-1, 4, -1, -2],
-                                 [-2, -1, 4, -1],
-                                 [-1, -2, -1, 4]])
+def element_stiffness_matrix(w, h):
+    # When multiplying each entry formula by w * h /16, we get the following reduced formulas:
+    wh = w/h
+    hw = h/w
+    # Main diagonal
+    a = (1/3) * (hw + wh)
+    # Skew diagonal
+    b = (1/6) * (hw - 2*wh)
+    # First off-diagonal
+    c = -(1/6) * (2*hw - wh)
+    # Second off-diagonal
+    d = -(1/6) * (hw + wh)
+    # Construct element stiffness matrix
+    Ke = np.array([[a, c, d, b],
+                   [c, a, b, d],
+                   [d, b, a, c],
+                   [b, d, c, a]])
     return Ke
 
-def generate_global_coordinates(width, height=None):
-    if height is None:
-        height = width
-    
-    # Generate global coordinates for interior nodes
-    # given Dirichlet BCs
-    x_nodes = np.linspace(-2, 2, width)
-    x_nodes = x_nodes[1:-1]
-    y_nodes = np.linspace(-2, 2, height)
-    y_nodes = y_nodes[1:-1]
-
-    # Create meshgrid of coordinates
-    x_mesh, y_mesh = np.array(np.meshgrid(x_nodes, y_nodes))
-    # Reshape as list of (x, y) pairs
-    global_coordinates = np.column_stack((x_mesh.ravel(), y_mesh.ravel()))
+def generate_global_coordinates(x_nodes, y_nodes=None):
+    if y_nodes is None:
+        y_nodes = x_nodes
+        
+    y_nodes = y_nodes[::-1]
+    global_coordinates = []
+    for y in y_nodes:
+        for x in x_nodes:
+            global_coordinates.append([x, y])
+    global_coordinates = np.array(global_coordinates)
     return global_coordinates
 
 
-def global_assembly(width, height=None):
-    if height is None:
-        height = width
+def global_assembly(x_nodes, y_nodes=None):
+    if y_nodes is None:
+        y_nodes = x_nodes
         
-    global_coordinates = generate_global_coordinates(width, height)
+    global_coordinates = generate_global_coordinates(x_nodes, y_nodes)
     
+    width = len(x_nodes)
+    height = len(y_nodes)
+
     global_indices = global_indexing(width, height)
     connectivity_matrix = generate_connectivity_matrix(global_indices)
 
-    num_nodes = (width - 2) * (height - 2)
+    num_nodes = width * height
     M_global = np.zeros((num_nodes, num_nodes))
     K_global = np.zeros((num_nodes, num_nodes))
     
-    for element in range(connectivity_matrix.shape[0]):
-        # Get the global node indices for this element
-        element_coordinates = connectivity_matrix[element, :]
+    for element in connectivity_matrix:
         
-        # Extract x and y coordinates for element
-        # x coordinates
-        xe = global_coordinates[element_coordinates, 0]  
-        # y coordinates
-        ye = global_coordinates[element_coordinates, 1] 
-        
-        # Compute element matrices
-        Me = element_mass_matrix(xe, ye)
-        Ke = element_stiffness_matrix(xe, ye)
-        
+        # Bottom-left (node 0)
+        x0 = global_coordinates[element[0], 0]
+        y0 = global_coordinates[element[0], 1]
+
+        # Bottom-right (node 1)
+        x1 = global_coordinates[element[1], 0]
+
+        # Top-left (node 3)
+        y3 = global_coordinates[element[3], 1]
+
+        # Element width and height
+        w = abs(x1 - x0)
+        h = abs(y3 - y0)
+
+        # Get element matrices
+        Me = element_mass_matrix(w, h)
+        Ke = element_stiffness_matrix(w, h)
+
         # Add element contributions to global matrices
         for i_local in range(4):
-            i_global = element_coordinates[i_local]
+            i_global = element[i_local]
             for j_local in range(4):
-                j_global = element_coordinates[j_local]
+                j_global = element[j_local]
                 M_global[i_global, j_global] += Me[i_local, j_local]
                 K_global[i_global, j_global] += Ke[i_local, j_local]
     
     return global_coordinates, M_global, K_global
 
+def classify_boundary_nodes(global_indexing):
+    # Create a boundary indicator array where 1 indicates a boundary node
+    boundary_indicator = np.zeros_like(global_indexing)
+    boundary_indicator[0, :] = 1  # Top boundary
+    boundary_indicator[-1, :] = 1  # Bottom boundary
+    boundary_indicator[:, 0] = 1  # Left boundary
+    boundary_indicator[:, -1] = 1  # Right boundary
+    return boundary_indicator.flatten()
+
+def implement_dirichlet_bc(M, K,boundary_indicator):
+    num_nodes = M.shape[0]
+    for i in range(num_nodes):
+        if boundary_indicator[i] == 1:
+            M[i, :] = 0
+            M[:, i] = 0
+            M[i, i] = 1
+            K[i, :] = 0
+            K[:, i] = 0
+            K[i, i] = 1
+    return M, K
+
+def u_0(coordinates, boundary_indicator):
+    x = coordinates[:, 0]
+    y = coordinates[:, 1]
+    u = np.sin(2*np.pi*x) * np.sin(2*np.pi*y)
+    u[boundary_indicator == 1] = 0.0  # Apply Dirichlet BCs
+    num_nodes = coordinates.shape[0]
+    return u.reshape((num_nodes,1))
+
 if __name__ == "__main__":
     width = 5  # Number of nodes along one dimension
     global_indices = global_indexing(width)
     connectivity_matrix = generate_connectivity_matrix(global_indices)
-    _, M, K = global_assembly(width)
     
-    global_with_boundary = global_indexing(width, include_boundary=True)
-    connectivity_matrix_with_boundary = generate_connectivity_matrix(global_with_boundary)
+    x_nodes = np.array([-2, -1.6, -1.2, -0.8, 2])
+    _, M, K = global_assembly(x_nodes)
     
-    M_inverse = np.linalg.inv(M)
-    M_inv_K = np.dot(M_inverse, K)
+    coordinates = generate_global_coordinates(x_nodes)
+    boundary_indicator = classify_boundary_nodes(global_indices)
+    u = u_0(coordinates, boundary_indicator).reshape(5,5)
+    print(u)
+
+    # avoid forming explicit inverse; use solve for M^{-1} K
+    M_inv_K = np.linalg.solve(M, K)
     evals = np.linalg.eigvals(M_inv_K)
     max_eigenvalue = np.max(np.abs(evals))
+    M_evals = np.linalg.eigvals(M)
+    K_evals = np.linalg.eigvals(K)
 
     with open("./outputs_4/matrices.txt", "w") as f:
-        latex_matrix = sp.latex(sp.Matrix(connectivity_matrix_with_boundary))
-        f.write("Connectivity Matrix with Boundary:\n")
+        latex_matrix = sp.latex(sp.Matrix(coordinates))
+        f.write("Global Coordinates:\n")
         f.write(latex_matrix + "\n\n")
         
-        print(global_indices)
+        # print(global_indices)
         latex_matrix = sp.latex(sp.Matrix(global_indices))
         f.write("Global Indices Matrix:\n")
         f.write(latex_matrix + "\n\n")
         
-        print(connectivity_matrix)
+        # print(connectivity_matrix)
         latex_matrix = sp.latex(sp.Matrix(connectivity_matrix))
         f.write("Connectivity Matrix:\n")
         f.write(latex_matrix + "\n\n")
 
         M = np.round(M, 4)
-        latex_matrix = sp.latex(sp.Matrix(M))
-        f.write("Mass Matrix:\n")
-        f.write(latex_matrix + "\n\n")
+        M_split = np.array_split(M, 3, axis=1)
+        latex_1_matrix = sp.latex(sp.Matrix(M_split[0]))
+        latex_2_matrix = sp.latex(sp.Matrix(M_split[1]))
+        latex_3_matrix = sp.latex(sp.Matrix(M_split[2]))
+        f.write("Mass Matrix (Part 1):\n")
+        f.write(latex_1_matrix + "\n\n")
+        f.write("Mass Matrix (Part 2):\n")
+        f.write(latex_2_matrix + "\n\n")
+        f.write("Mass Matrix (Part 3):\n")
+        f.write(latex_3_matrix + "\n\n")
 
         K = np.round(K, 4)
-        latex_matrix = sp.latex(sp.Matrix(K))
-        f.write("Stiffness Matrix:\n")
+        K_split = np.array_split(K, 3, axis=1)
+        latex_1_matrix = sp.latex(sp.Matrix(K_split[0]))
+        latex_2_matrix = sp.latex(sp.Matrix(K_split[1]))
+        latex_3_matrix = sp.latex(sp.Matrix(K_split[2]))
+        f.write("Stiffness Matrix (Part 1):\n")
+        f.write(latex_1_matrix + "\n\n")
+        f.write("Stiffness Matrix (Part 2):\n")
+        f.write(latex_2_matrix + "\n\n")
+        f.write("Stiffness Matrix (Part 3):\n")
+        f.write(latex_3_matrix + "\n\n")
+
+        latex_matrix = sp.latex(sp.Matrix(M_evals))
+        f.write("Mass Matrix Evals:\n")
         f.write(latex_matrix + "\n\n")
         
+        latex_matrix = sp.latex(sp.Matrix(K_evals))
+        f.write("Stiffness Matrix Evals:\n")
+        f.write(latex_matrix + "\n\n")
+
         latex_matrix = sp.latex(sp.Matrix(evals))
         f.write("M^-1 * K Evals:\n")
         f.write(latex_matrix + "\n\n")
         
         f.write(f"Maximum Eigenvalue of M^-1 * K: {max_eigenvalue}\n")
+    
