@@ -1,4 +1,3 @@
-from copy import deepcopy
 import numpy as np
 import sympy as sp
 
@@ -124,7 +123,6 @@ def implement_dirichlet_bc(M, K,boundary_indicator):
             M[i, i] = 1
             K[i, :] = 0
             K[:, i] = 0
-            K[i, i] = 1
     return M, K
 
 def u_0(coordinates, boundary_indicator):

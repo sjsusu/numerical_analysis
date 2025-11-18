@@ -5,7 +5,8 @@ def jacobi(A, b, x0=None, tol=1e-12, max_iterations=10000):
     diagonal_list = np.diag(A)
     D = np.diagflat(diagonal_list)
     R = A - D
-    D_inverse = np.linalg.inv(D)
+    inverse_diag_list = 1.0 / diagonal_list
+    D_inverse = np.diagflat(inverse_diag_list)
 
     for _ in range(max_iterations):
         rx_b = -np.dot(R, x_prev) + b

@@ -123,7 +123,7 @@ Where $u,v \in V$. Denote the left hand side as $a(u,v)$ and the right hand side
 
 \vspace{1em}
 {\large \textbf{Discretization and Global System}} \\
-We discretize the spatial domain $\Omega$ into rectangular elements. Let $V_h \subset V$ be the finite-dimensional subspace spanned by the basis functions $\{\phi_i\}_{i=1}^{N}$, where $N$ is the total number of nodes in the mesh (will be reduced later on based on BC). Each bilinear $\phi_n$ corresponds to some node $(x_i, y_j)$ satisfying $\phi_{i,j} = \delta_{i,j}$. We assume $u_h\in V_h$ satisfies the weak formulation $a(u_h,v_h) = L(v_h)$ for all $v_h \in V_h$.
+We discretize the spatial domain $\Omega$ into rectangular elements. Let $V_h \subset V$ be the finite-dimensional subspace spanned by the basis functions $\{\phi_i\}_{i=1}^{N}$, where $N$ is the total number of nodes in the mesh. Each bilinear $\phi_n$ corresponds to some node $(x_i, y_j)$ satisfying $\phi_{i,j} = \delta_{i,j}$. We assume $u_h\in V_h$ satisfies the weak formulation $a(u_h,v_h) = L(v_h)$ for all $v_h \in V_h$.
 
 Approximate the solution of $u$ as:
 \[u_h = \sum_{j=1}^{N} U_j(t) \phi_j(x,y)\]
@@ -683,6 +683,8 @@ Assemble the global mass matrix $M$ and global stiffness matrix $K$ for the enti
 % \end{tabular}
 % \end{center}
 
+To impose homogeneous Dirichlet boundary conditions on all boundary nodes, for every node on the boundary, we will zero out the corresponding rows and columns in the global mass and stiffness matrices, and set the diagonal entry to $1$. 
+
 We will adjust the indexing in the preliminary setup to match this scenario. From before we had:
 \[\sum_{i,j=1}^{N} \left( \int_{\Omega} \Phi_i \Phi_j \ dx \right) \frac{dU_i}{dt} + \nu \sum_{i,j=1}^{N}  \left( \int_{\Omega} \nabla \Phi_i \cdot \nabla \Phi_j \ dx \right) U_i = \sum_{j=1}^{N}\int_{\Omega} f \Phi_j \ dx\] 
 Was our global discretized system, where $N$ is the total number of nodes. Rewriting this terms of the elemental components, we have:
@@ -731,7 +733,8 @@ def element_stiffness_matrix(w, h):
 def generate_global_coordinates(x_nodes, y_nodes=None):
     if y_nodes is None:
         y_nodes = x_nodes
-        
+
+    # Reverse to match global indexing when constructing coordinates
     y_nodes = y_nodes[::-1]
     global_coordinates = []
     for y in y_nodes:
@@ -750,15 +753,18 @@ def global_assembly(x_nodes, y_nodes=None):
     width = len(x_nodes)
     height = len(y_nodes)
 
+    # Get connectivity matrix
     global_indices = global_indexing(width, height)
     connectivity_matrix = generate_connectivity_matrix(global_indices)
 
+    # Initialize global matrices
     num_nodes = width * height
     M_global = np.zeros((num_nodes, num_nodes))
     K_global = np.zeros((num_nodes, num_nodes))
     
+    # Assembly
     for element in connectivity_matrix:
-        
+        # Get element coordinates to compute element width and height
         # Bottom-left (node 0)
         x0 = global_coordinates[element[0], 0]
         y0 = global_coordinates[element[0], 1]
@@ -786,6 +792,29 @@ def global_assembly(x_nodes, y_nodes=None):
                 K_global[i_global, j_global] += Ke[i_local, j_local]
     
     return global_coordinates, M_global, K_global
+
+# Generate array that indicates boundary nodes (1 for boundary, 0 for interior)
+def classify_boundary_nodes(global_indexing):
+    # Create a boundary indicator array where 1 indicates a boundary node
+    boundary_indicator = np.zeros_like(global_indexing)
+    boundary_indicator[0, :] = 1  # Top boundary
+    boundary_indicator[-1, :] = 1  # Bottom boundary
+    boundary_indicator[:, 0] = 1  # Left boundary
+    boundary_indicator[:, -1] = 1  # Right boundary
+    return boundary_indicator.flatten()
+
+# Apply Dirichlet boundary conditions to global matrices
+def implement_dirichlet_bc(M, K, boundary_indicator):
+    num_nodes = M.shape[0]
+    for i in range(num_nodes):
+        if boundary_indicator[i] == 1:
+            M[i, :] = 0
+            M[:, i] = 0
+            M[i, i] = 1
+            K[i, :] = 0
+            K[:, i] = 0
+            K[i, i] = 1
+    return M, K
 
 if __name__ == "__main__":
     x_nodes = np.array([-2, -1.6, -1.2, -0.8, 2])
@@ -817,16 +846,16 @@ if __name__ == "__main__":
         f.write(latex_3_matrix + "\n\n")
 \end{lstlisting}
 
-The code was constructed such that non-uniform meshes of arbitrary widths and heights could be used.
+The code was constructed such that non-uniform meshes of arbitrary node widths and heights could be used.
 
-Our mass matrix $M$ will be of size $25 \times 25$ and was found to be:
+Our global mass matrix $M$ will be of size $25 \times 25$ and was found to be:
 \[\left[\begin{matrix}0.1244 & 0.0622 & 0.0 & 0.0 & 0.0 & 0.0622 & 0.0311 & 0.0 & 0.0\\0.0622 & 0.2489 & 0.0622 & 0.0 & 0.0 & 0.0311 & 0.1244 & 0.0311 & 0.0\\0.0 & 0.0622 & 0.2489 & 0.0622 & 0.0 & 0.0 & 0.0311 & 0.1244 & 0.0311\\0.0 & 0.0 & 0.0622 & 0.9956 & 0.4356 & 0.0 & 0.0 & 0.0311 & 0.4978\\0.0 & 0.0 & 0.0 & 0.4356 & 0.8711 & 0.0 & 0.0 & 0.0 & 0.2178\\0.0622 & 0.0311 & 0.0 & 0.0 & 0.0 & 0.1422 & 0.0711 & 0.0 & 0.0\\0.0311 & 0.1244 & 0.0311 & 0.0 & 0.0 & 0.0711 & 0.2844 & 0.0711 & 0.0\\0.0 & 0.0311 & 0.1244 & 0.0311 & 0.0 & 0.0 & 0.0711 & 0.2844 & 0.0711\\0.0 & 0.0 & 0.0311 & 0.4978 & 0.2178 & 0.0 & 0.0 & 0.0711 & 1.1378\\0.0 & 0.0 & 0.0 & 0.2178 & 0.4356 & 0.0 & 0.0 & 0.0 & 0.4978\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0089 & 0.0044 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0711\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0311\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
 \[ \cdots \left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.2178 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.4356 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0089 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0\\0.4978 & 0.0 & 0.0 & 0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0\\0.9956 & 0.0 & 0.0 & 0.0 & 0.0311 & 0.0622 & 0.0 & 0.0\\0.0 & 0.0356 & 0.0178 & 0.0 & 0.0 & 0.0 & 0.0089 & 0.0044\\0.0 & 0.0178 & 0.0711 & 0.0178 & 0.0 & 0.0 & 0.0044 & 0.0178\\0.0 & 0.0 & 0.0178 & 0.0711 & 0.0178 & 0.0 & 0.0 & 0.0044\\0.0311 & 0.0 & 0.0 & 0.0178 & 0.2844 & 0.1244 & 0.0 & 0.0\\0.0622 & 0.0 & 0.0 & 0.0 & 0.1244 & 0.2489 & 0.0 & 0.0\\0.0 & 0.0089 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0356 & 0.0178\\0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0178 & 0.0711\\0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0 & 0.0178\\0.0 & 0.0 & 0.0 & 0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0311 & 0.0622 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0089 & 0.0044\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044 & 0.0178\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0044\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
 \[\cdots \left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0044 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0178 & 0.0044 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0311 & 0.0622 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0089 & 0.0044 & 0.0 & 0.0 & 0.0\\0.0178 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0 & 0.0\\0.0711 & 0.0178 & 0.0 & 0.0 & 0.0044 & 0.0178 & 0.0044 & 0.0\\0.0178 & 0.2844 & 0.1244 & 0.0 & 0.0 & 0.0044 & 0.0711 & 0.0311\\0.0 & 0.1244 & 0.2489 & 0.0 & 0.0 & 0.0 & 0.0311 & 0.0622\\0.0 & 0.0 & 0.0 & 0.0178 & 0.0089 & 0.0 & 0.0 & 0.0\\0.0044 & 0.0 & 0.0 & 0.0089 & 0.0356 & 0.0089 & 0.0 & 0.0\\0.0178 & 0.0044 & 0.0 & 0.0 & 0.0089 & 0.0356 & 0.0089 & 0.0\\0.0044 & 0.0711 & 0.0311 & 0.0 & 0.0 & 0.0089 & 0.1422 & 0.0622\\0.0 & 0.0311 & 0.0622 & 0.0 & 0.0 & 0.0 & 0.0622 & 0.1244\end{matrix}\right]\]
 
 \newpage
 
-Our stiffness matrix $K$ will also be of size $25 \times 25$ and was found to be (without $\nu$):
+Our global stiffness matrix $K$ will also be of size $25 \times 25$ and was found to be (without $\nu$):
 \[\left[\begin{matrix}2.381 & -2.3095 & 0.0 & 0.0 & 0.0 & 1.119 & -1.1905 & 0.0 & 0.0\\-2.3095 & 4.7619 & -2.3095 & 0.0 & 0.0 & -1.1905 & 2.2381 & -1.1905 & 0.0\\0.0 & -2.3095 & 4.7619 & -2.3095 & 0.0 & 0.0 & -1.1905 & 2.2381 & -1.1905\\0.0 & 0.0 & -2.3095 & 3.0476 & -0.1667 & 0.0 & 0.0 & -1.1905 & 0.9524\\0.0 & 0.0 & 0.0 & -0.1667 & 0.6667 & 0.0 & 0.0 & 0.0 & -0.3333\\1.119 & -1.1905 & 0.0 & 0.0 & 0.0 & 3.0476 & -2.4762 & 0.0 & 0.0\\-1.1905 & 2.2381 & -1.1905 & 0.0 & 0.0 & -2.4762 & 6.0952 & -2.4762 & 0.0\\0.0 & -1.1905 & 2.2381 & -1.1905 & 0.0 & 0.0 & -2.4762 & 6.0952 & -2.4762\\0.0 & 0.0 & -1.1905 & 0.9524 & -0.3333 & 0.0 & 0.0 & -2.4762 & 6.0952\\0.0 & 0.0 & 0.0 & -0.3333 & -0.1667 & 0.0 & 0.0 & 0.0 & 0.9524\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.1667 & -0.3333 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -2.4762\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -1.1905\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
 \[\cdots \left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.1667 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & -0.1667 & -0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & 0.0\\0.9524 & 0.0 & 0.0 & -0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0\\3.0476 & 0.0 & 0.0 & 0.0 & -1.1905 & -2.3095 & 0.0 & 0.0\\0.0 & 1.3333 & -0.3333 & 0.0 & 0.0 & 0.0 & -0.1667 & -0.3333\\0.0 & -0.3333 & 2.6667 & -0.3333 & 0.0 & 0.0 & -0.3333 & -0.3333\\0.0 & 0.0 & -0.3333 & 2.6667 & -0.3333 & 0.0 & 0.0 & -0.3333\\-1.1905 & 0.0 & 0.0 & -0.3333 & 6.0952 & 2.2381 & 0.0 & 0.0\\-2.3095 & 0.0 & 0.0 & 0.0 & 2.2381 & 4.7619 & 0.0 & 0.0\\0.0 & -0.1667 & -0.3333 & 0.0 & 0.0 & 0.0 & 1.3333 & -0.3333\\0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & -0.3333 & 2.6667\\0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0 & -0.3333\\0.0 & 0.0 & 0.0 & -0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & -1.1905 & -2.3095 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.1667 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -0.3333\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\end{matrix}\right]\cdots\]
 \[\left[\begin{matrix}0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & -0.3333 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\-0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & -1.1905 & -2.3095 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0\\0.0 & 0.0 & 0.0 & -0.1667 & -0.3333 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0 & 0.0\\2.6667 & -0.3333 & 0.0 & 0.0 & -0.3333 & -0.3333 & -0.3333 & 0.0\\-0.3333 & 6.0952 & 2.2381 & 0.0 & 0.0 & -0.3333 & -2.4762 & -1.1905\\0.0 & 2.2381 & 4.7619 & 0.0 & 0.0 & 0.0 & -1.1905 & -2.3095\\0.0 & 0.0 & 0.0 & 0.6667 & -0.1667 & 0.0 & 0.0 & 0.0\\-0.3333 & 0.0 & 0.0 & -0.1667 & 1.3333 & -0.1667 & 0.0 & 0.0\\-0.3333 & -0.3333 & 0.0 & 0.0 & -0.1667 & 1.3333 & -0.1667 & 0.0\\-0.3333 & -2.4762 & -1.1905 & 0.0 & 0.0 & -0.1667 & 3.0476 & 1.119\\0.0 & -1.1905 & -2.3095 & 0.0 & 0.0 & 0.0 & 1.119 & 2.381\end{matrix}\right]\cdots\]
@@ -839,40 +868,25 @@ Using the following initial condition
 to solve the reduced ODE system from $t=0$ to $t=1$. (Show Code)
 
 \solution
-Given our system:
+We have the system:
 \[M \frac{dU}{dt} + \nu KU = 0\]
-We can rearrange this to get:
-\[\frac{dU}{dt} = -\nu M^{-1}K U\]
 
 {\large \textbf{Implicit: Backward Euler}}\\
 Let us find $U^{n+1}$ implicitly using backward difference in time:
-\[\frac{U^{n+1} - U^{n}}{\Delta t} = -\nu M^{-1}K U^{n+1}\]
+\[ M \cdot \frac{U^{n+1} - U^{n}}{\Delta t} + \nu K U^{n+1} = 0\]
 Rearranging for $U^{n+1}$, we have:
-\[\left( I + \nu \Delta t M^{-1}K \right) U^{n+1} = U^{n}\]
+\[M U^{n+1} + \nu \Delta t K U^{n+1} = M U^{n}\]
+\[ (M+ \nu \Delta t K) U^{n+1} = M U^{n}\]
+Let us denote $A = M + \nu \Delta t K$. At each time step, we may solve the following system for $U^{n+1}$:
+\[ A U^{n+1} = M U^{n}\]
+We will use numpy's built-in linear solver to solve the systems above.
 
+Since we are using an implicit method, there is no stability condition on our time step $\Delta t$. However, for accuracy, we will choose sufficiently small $\Delta t$.
+
+\newpage
 The following code was used to implement the implicit backward Euler method:
 \begin{lstlisting}[language=Python, caption={implicit\_euler.py}]
 import numpy as np
-def classify_boundary_nodes(global_indexing):
-    # Create a boundary indicator array where 1 indicates a boundary node
-    boundary_indicator = np.zeros_like(global_indexing)
-    boundary_indicator[0, :] = 1  # Top boundary
-    boundary_indicator[-1, :] = 1  # Bottom boundary
-    boundary_indicator[:, 0] = 1  # Left boundary
-    boundary_indicator[:, -1] = 1  # Right boundary
-    return boundary_indicator.flatten()
-
-def implement_dirichlet_bc(M, K,boundary_indicator):
-    num_nodes = M.shape[0]
-    for i in range(num_nodes):
-        if boundary_indicator[i] == 1:
-            M[i, :] = 0
-            M[:, i] = 0
-            M[i, i] = 1
-            K[i, :] = 0
-            K[:, i] = 0
-            K[i, i] = 1
-    return M, K
 
 def u_0(coordinates, boundary_indicator):
     x = coordinates[:, 0]
@@ -1056,7 +1070,8 @@ if __name__ == "__main__":
     fig.savefig("./outputs_4/implicit_convergence_study.png", dpi=300)
 \end{lstlisting}
 
-For efficiency, we use numpy's built in linear algebra. We get the resulting error plot below:
+\newpage
+We get the resulting error plot below:
 
 \begin{center}
     \includegraphics[width=0.7\textwidth]{../outputs_4/implicit_convergence_study.png}
@@ -1073,6 +1088,14 @@ The following plot was generated using the implicit solver at $t=1$:
 \begin{center}
     \includegraphics[width=0.9\textwidth]{../outputs_4/implicit_solution.png}
 \end{center}
+
+Given the non-uniform mesh, our approximation doesn't completely capture the exact solution and gets distorted.
+Here another set of plots using a uniform mesh with 8 evenly spaced nodes in both $x$ and $y$ directions:
+\begin{center}
+    \includegraphics[width=0.9\textwidth]{../outputs_4/implicit_solution_uniform.png}
+\end{center}
+
+We can see the approximation is much better at capturing the shape of the exact solution.
 
 \newpage
     \vspace{1em}

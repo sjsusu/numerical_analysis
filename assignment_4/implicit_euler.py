@@ -56,21 +56,20 @@ if __name__ == "__main__":
     plt.rcParams["axes.grid"] = True
     plt.rc("grid", color="#a6a6a6", linestyle="dotted", linewidth=0.5)
     plt.style.use("seaborn-v0_8-deep")
-    
-    x_nodes = np.array([-2, -1.6, -1.2, -0.8, 2])
-    # x_nodes = chebyshev_nodes(7) * 2  # Scale to [-2, 2]
+
+    x_nodes = np.array([-2,-1.6, -1.2, -0.8, 2])
+    # x_nodes = np.linspace(-2, 2, 8)
     width = len(x_nodes)
     dt = 0.01
     t_final = 1
     boundary, U, global_coordinates = implicit_heat_solver(x_nodes, dt, t_final)
     u_approx = U[:,:,-1].reshape((width, width))
-
-    # create plotting mesh consistent with assembly (y reversed in generate_global_coordinates)
+    
     x_mesh = global_coordinates[:,0].reshape((width, width))
     y_mesh = global_coordinates[:,1].reshape((width, width))
     u_exact_values = u_exact(x_nodes, y_mesh, 1, boundary)
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12,6))
     ax1 = fig.add_subplot(121, projection='3d')
     ax1.plot_surface(x_mesh, y_mesh, u_approx, cmap='viridis', alpha=0.8)
     ax1.set_xlabel('x')
@@ -86,7 +85,8 @@ if __name__ == "__main__":
     ax2.set_title('Exact Solution')
 
     fig.savefig("./outputs_4/implicit_solution.png", dpi=300)
-    plt.show()
+    # fig.savefig("./outputs_4/implicit_solution_uniform.png", dpi=300)
+    # plt.show()
     
     dt_values = np.logspace(-1, -10, 10, base=2)
     errors_implicit = convergence_study_timesteps(x_nodes, t_final, dt_values)
@@ -97,4 +97,3 @@ if __name__ == "__main__":
     ax.set_title('Convergence Study for Implicit Solver')
     ax.legend()
     fig.savefig("./outputs_4/implicit_convergence_study.png", dpi=300, bbox_inches='tight')
-
