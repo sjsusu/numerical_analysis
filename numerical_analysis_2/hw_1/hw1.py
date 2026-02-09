@@ -17,53 +17,41 @@ def f(Y):
     dydt = -GAMMA * y + DELTA * x * y
     return np.array([dxdt, dydt])
 
-def picard_step(y_prev_time, y, h):
+def picard_step(y_prev_time, y_prev_iter, h):
+    # Notation:
+    # y_prev_time = [x_n, y_n] = [x_{n}, y_{n}]
+    # y_prev_iter = [x_prev, y_prev] = [x_{n+1}^{k}, y_{n+1}^{k}]
+    # y_new_iter = [x_new, y_new] = [x_{n+1}^{k+1}, y_{n+1}^{k+1}]
+
     def find_constants(y_prev_time, y_prev_iter):
-        # Notation:
-        # y_prev_time = [x_n, y_n]
-        # y_prev_iter = [x_{n+1}^k, y_{n+1}^k]
-        # next = n+1 (the next time step)
         xn, yn = y_prev_time
         x_prev, y_prev = y_prev_iter
 
-        constants = np.array(
-            [
-                # Constant for x_n
-                (1 + h * ALPHA / 2 - h * BETA * yn / 2),
-                # Constant for x_{n+1}^k
-                (h / 2) * (ALPHA - BETA * y_prev),
-                # Constant for y_n
-                (1 - h * GAMMA / 2 + h * DELTA * xn / 2),
-                # Constant for y_{n+1}^k
-                (h / 2) * (-GAMMA + DELTA * x_prev),
-            ]
-        )
+        constants = np.array([
+            # Constant for x_n
+            (1 + h * ALPHA / 2 - h * BETA * yn / 2),
+            # Constant for x_{n+1}^k
+            (h / 2) * (ALPHA - BETA * y_prev),
+            # Constant for y_n
+            (1 - h * GAMMA / 2 + h * DELTA * xn / 2),
+            # Constant for y_{n+1}^k
+            (h / 2) * (-GAMMA + DELTA * x_prev),
+        ])
 
         return constants
 
-    def find_error(y_prev, y_new):
-        # Notation:
-        # y_prev = [x_prev, y_prev] = [x_{n+1}^{k}, y_{n+1}^{k}]
-        # y_new = [x_new, y_new] = [x_{n+1}^{k+1}, y_{n+1}^{k+1}]
-        x_prev, y_prev = y_prev
-        x_new, y_new = y_new
-
-        error = max(abs(x_new - x_prev), abs(y_new - y_prev))
-
-        return error
-
-    # Find constants for the linear combination of the previous time step and the previous iteration
-    c1, c2, c3, c4 = find_constants(y_prev_time, y)
+    # Find constants for the linear combination of the previous time step and the previous iteration as noted in question 2
+    c1, c2, c3, c4 = find_constants(y_prev_time, y_prev_iter)
 
     xn, yn = y_prev_time
-    x_prev, y_prev = y
+    x_prev, y_prev = y_prev_iter
 
     # Compute the new values for x and y
     x_new = c1 * xn + c2 * x_prev
     y_new = c3 * yn + c4 * y_prev
     y_new_iter = np.array([x_new, y_new])
 
-    error = find_error(y, y_new_iter)
+    error = max(abs(x_new - x_prev), abs(y_new - y_prev))
 
     return y_new_iter, error
 

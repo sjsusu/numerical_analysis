@@ -125,12 +125,13 @@ def f(Y):
     dydt = -GAMMA * y + DELTA * x * y
     return np.array([dxdt, dydt])
 
-def picard_step(y_prev_time, y, h):
+def picard_step(y_prev_time, y_prev_iter, h):
+    # Notation:
+    # y_prev_time = [x_n, y_n] = [x_{n}, y_{n}]
+    # y_prev_iter = [x_prev, y_prev] = [x_{n+1}^{k}, y_{n+1}^{k}]
+    # y_new_iter = [x_new, y_new] = [x_{n+1}^{k+1}, y_{n+1}^{k+1}]
+
     def find_constants(y_prev_time, y_prev_iter):
-        # Notation:
-        # y_prev_time = [x_n, y_n]
-        # y_prev_iter = [x_{n+1}^k, y_{n+1}^k]
-        # next = n+1 (the next time step)
         xn, yn = y_prev_time
         x_prev, y_prev = y_prev_iter
 
@@ -147,29 +148,18 @@ def picard_step(y_prev_time, y, h):
 
         return constants
 
-    def find_error(y_prev, y_new):
-        # Notation:
-        # y_prev = [x_prev, y_prev] = [x_{n+1}^{k}, y_{n+1}^{k}]
-        # y_new = [x_new, y_new] = [x_{n+1}^{k+1}, y_{n+1}^{k+1}]
-        x_prev, y_prev = y_prev
-        x_new, y_new = y_new
-
-        error = max(abs(x_new - x_prev), abs(y_new - y_prev))
-
-        return error
-
     # Find constants for the linear combination of the previous time step and the previous iteration as noted in question 2
-    c1, c2, c3, c4 = find_constants(y_prev_time, y)
+    c1, c2, c3, c4 = find_constants(y_prev_time, y_prev_iter)
 
     xn, yn = y_prev_time
-    x_prev, y_prev = y
+    x_prev, y_prev = y_prev_iter
 
     # Compute the new values for x and y
     x_new = c1 * xn + c2 * x_prev
     y_new = c3 * yn + c4 * y_prev
     y_new_iter = np.array([x_new, y_new])
 
-    error = find_error(y, y_new_iter)
+    error = max(abs(x_new - x_prev), abs(y_new - y_prev))
 
     return y_new_iter, error
 
@@ -225,7 +215,6 @@ if __name__ == "__main__":
         plt.cla()
 \end{lstlisting}
 
-\newpage
 For $\Delta t = 0.1$, the plot of $x(t)$ and $y(t)$ over $[0,100]$ is as follows:
 \begin{center}
     \includegraphics[width=0.75\textwidth]{../outputs/cn_0_1.png}
@@ -258,8 +247,10 @@ Our observations suggest that for $\Delta t \geq 0.8$, the Picard operator assoc
 
 \textbf{(b)} Phase plots of $y(t)$ vs $x(t)$ for $\Delta t \in \{0.025, 0.5\}$.
 
+The following code was added to the main block of question 3 to generate the phase plots our phase portraits::
+
 \begin{lstlisting}[language=Python, caption={Phase Plots Python}]
-if __name__ == "__main__": # Was added to main from question 3
+if __name__ == "__main__":
     h_values = [0.025, 0.5]
     file_name_labels = ['0_025', '0_5']
     for h, label in zip(h_values, file_name_labels):
@@ -274,6 +265,7 @@ if __name__ == "__main__": # Was added to main from question 3
         plt.cla()
 \end{lstlisting}
 
+\newpage
 The phase plots for $\Delta t = 0.025$ and $\Delta t = 0.5$ are as follows:
 \begin{center}
     \includegraphics[width=0.65\textwidth]{../outputs/cn_phase_0_025.png}
