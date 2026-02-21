@@ -19,8 +19,8 @@ def f(Y):
 
 def picard_step(y_prev_time, y_prev_iter, h):
     # Notation:
-    # y_prev_time = [x_n, y_n] = [x_{n}, y_{n}]
-    # y_prev_iter = [x_prev, y_prev] = [x_{n+1}^{k}, y_{n+1}^{k}]
+    # y_prev_time = [xn, yn] = [x_n, y_n]
+    # y_prev_iter = [x_prev, y_prev] = [x_{n+1}^k, y_{n+1}^k]
     # y_new_iter = [x_new, y_new] = [x_{n+1}^{k+1}, y_{n+1}^{k+1}]
 
     def find_constants(y_prev_time, y_prev_iter):
