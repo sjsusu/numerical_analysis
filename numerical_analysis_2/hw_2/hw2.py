@@ -107,8 +107,8 @@ if __name__ == "__main__":
     # ---------------------------------------------
     # Question 3
     # ---------------------------------------------
-    # each element of params is [sigma, rho, beta]
-    params = np.array(
+    # each element of param_sets is [sigma, rho, beta]
+    param_sets = np.array(
         [
             # Case A
             [10, 5, 8 / 3],
@@ -120,4 +120,37 @@ if __name__ == "__main__":
             [10, 40, 8 / 3],
         ]
     )
+    
+    set_labels = ["A", "B", "C", "D"]
+    
+    u_0 = np.array([1, 1, 1])
+    h = 0.01 # baseline time step
+    time_values = np.arange(0, 50 + h, h)
+    dimensions = ["x", "y", "z"]
+    
+    # Generate plots for each case
+    for params, label in zip(param_sets, set_labels):
+        u_values = RK4_solver(u_0, h, *params)
+        
+        # Plot x(t), y(t), z(t) individually 
+        for i, dim in enumerate(dimensions):
+            fig, ax = plt.subplots()
+            ax.plot(time_values, u_values[:, i], label=f"${dim}(t)$", color=default_colors[i])
+            ax.set_xlabel(r"$t$")
+            ax.set_ylabel(rf"${dim}(t)$")
+            ax.set_title(rf'RK4 for Case {label}: $(\sigma, \rho, \beta) = (10, {int(params[1])}, \frac{8}{3})$')
+            ax.legend()
+            fig.savefig(rf"./outputs/rk4_{label}_{dim}.png", dpi=300)
+            plt.close(fig)
+            
+        # Plot Phase Portrait
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot(u_values[:, 0], u_values[:, 1], u_values[:, 2], color=default_colors[3])
+        ax.set_xlabel(r'$x$')
+        ax.set_ylabel(r'$y$')
+        ax.set_zlabel(r'$z$')
+        plt.title(rf'Phase Portrait for Case {label}: $(\sigma, \rho, \beta) = (10, {int(params[1])}, \frac{8}{3})$')
+        plt.savefig(rf"./outputs/rk4_{label}_phase_portrait.png", dpi=300)
+        plt.close(fig)
     
