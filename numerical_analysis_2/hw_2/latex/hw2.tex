@@ -84,9 +84,10 @@
 \lhead{Math 5335: \emph{Numerical Analysis}}
 \rhead{Homework 1}
 \cfoot{}
-\rfoot{}
+\rfoot{\thepage}
 
 \begin{document}
+\setcounter{page}{2}
 \question{Implement RK4}
 Use baseline timestep $\Delta t = 0.01$ and $T=50$.
 \begin{itemize}
@@ -174,17 +175,17 @@ The following plots were obtained:
 \begin{center}
     Figure 1: RK4 results for different time steps.
 
-    \includegraphics[width=0.75\textwidth]{../outputs/rk4_q2.png}
+    \includegraphics[width=0.75\textwidth]{../outputs/q2/rk4_q2.png}
 
     Figure 2: SciPy's \texttt{solve\_ivp} results.
 
-    \includegraphics[width=0.75\textwidth]{../outputs/rk4_scipy.png}
+    \includegraphics[width=0.75\textwidth]{../outputs/q2/rk4_scipy.png}
 \end{center}
 
 \newpage
 From Figure 1, we observe that as the time step $\Delta t$ decreases, the solution seems to converge to a more consistent trajectory for larger time intervals. Or in other words, we see that the overlap for trajectories with smaller times steps is better before the Lorenz system's chaotic nature causes divergence. 
 
-In comparing Figures 1 and 2, we can see that the RK4 implementation closely matches the results from SciPy's \texttt{solve\_ivp} up until about $t\approx 13$ (when graphs are overlapped). After this point, the trajectories begin to diverge due to numerical differences. This behavior is expected as \texttt{solve\_ivp} uses an adaptive time-stepping method in comparison to our fixed time step RK4 implementation, which can lead to different numerical errors accumulating over time. However, since we observed that the initial trajectories match closely, we can conclude that our RK4 implementation is correct and captures the dynamics of the Lorenz system accurately for smaller time intervals.
+In comparing Figures 1 and 2, we can see that the RK4 implementation closely matches the results from SciPy's \texttt{solve\_ivp} up until about $t\approx 10$ (when graphs are overlapped). After this point, the trajectories begin to diverge due to numerical differences. This behavior is expected as \texttt{solve\_ivp} uses an adaptive time-stepping method in comparison to our fixed time step RK4 implementation, which can lead to different numerical errors accumulating over time. However, since we observed that the initial trajectories match closely, we can conclude that our RK4 implementation is correct and captures the dynamics of the Lorenz system accurately for smaller time intervals.
 
 \hrulefill
 
@@ -263,22 +264,22 @@ The following plots were obtained for each case: \\
     \textbf{Case A:} $(\sigma, \rho, \beta) = (10, 5, 8/3)$
 \end{center}
 
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_A_x.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_A_y.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_A_x.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_A_y.png}
 
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_A_z.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_A_phase_portrait.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_A_z.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_A_phase_portrait.png}
 
 \textbf{Comments:} For Case A, we observe that the curve in the phase portrait converges to a spiral sink around $(3.25, 3.25, 4)$. The spiral itself quickly converges to the fixed point and oscillations in all directions are dampened.
 \newpage
 \begin{center}
     \textbf{Case B:} $(\sigma, \rho, \beta) = (10, 15, 8/3)$
 \end{center}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_B_x.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_B_y.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_B_x.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_B_y.png}
 
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_B_z.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_B_phase_portrait.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_B_z.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_B_phase_portrait.png}
 
 \textbf{Comments:} For Case B, we observe that the curve in the phase portrait converges to a spiral sink around $(-6, -6, 14)$. The increase in $\rho$ caused the sinks to shift further from the origin and the oscillations to increase in amplitude. However, in this case, the system still converges to a fixed point (though slightly more slowly).
 
@@ -287,11 +288,11 @@ The following plots were obtained for each case: \\
     \textbf{Case C:} $(\sigma, \rho, \beta) = (10, 28, 8/3)$
 \end{center}
 
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_C_x.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_C_y.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_C_x.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_C_y.png}
 
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_C_z.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_C_phase_portrait.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_C_z.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_C_phase_portrait.png}
 
 \textbf{Comments:} For Case C, we observe the classical Lorenz attractor in the phase portrait. The curve travels in a figure eight pattern around the two distinct sources. The trajectory does not converge to a fixed point. Instead the curve oscillates between the two lobes of the attractor indefinitely. With this increase in $\rho$, the system underwent a bifurcation, transitioning from fixed point convergence to looping behavior.
 
@@ -300,13 +301,13 @@ The following plots were obtained for each case: \\
     \textbf{Case D:} $(\sigma, \rho, \beta) = (10, 40, 8/3)$
 \end{center}
 
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_D_x.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_D_y.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_D_x.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_D_y.png}
 
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_D_z.png}
-\includegraphics[width=0.5\textwidth]{../outputs/rk4_D_phase_portrait.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_D_z.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q3/rk4_D_phase_portrait.png}
 
-\textbf{Comments:} For Case D, we observe that again the lobes shift further from the origin with the increase in $\rho$. The trajectory still oscillates between the two lobes of the attractor indefinitely. However, the looping has larger amplitudes and the trajectory itself is more erratic.
+\textbf{Comments:} For Case D, we observe that again the lobes shift further from the origin with the increase in $\rho$. The trajectory still oscillates between the two lobes of the attractor indefinitely. However, the looping has larger amplitudes and the trajectory itself is more erratic.\\
 
 In general, as $\rho$ increases, the system transitions from stable equilibrium behavior to more complex and chaotic dynamics. When $\rho$ is sufficiently large, the sinks lose stability and the system exhibits the characteristic butterfly-shaped attractor of the Lorenz system. Where the trajectory oscillates between the two lobes of the attractor with no clear periodicity. Further increases in $\rho$ lead to more erratic switching between the lobes and enlarges the attractor itself. 
 
@@ -324,10 +325,83 @@ using the same $\Delta t$.
 \end{itemize}
 
 \solution
-temp text
 
-\hrulefill
+The following code was used to generate the required plots:
+\begin{lstlisting}[language=Python, caption={Question 4 Python}]
+if __name__ == "__main__":
+    # < Some Styling Setup and Enable Latex >
+    # ...
 
+    initial_conditions = np.array([
+        [1,1,1],
+        [1+1e-8, 1, 1]
+    ])
+    dimensions = ["x", "y", "z"]
+    ic_labels = ["original", "perturbed"]
+    
+    # Pick baseline dt
+    h = 0.01
+    # Use Case C parameters for this question
+    sigma, rho, beta = 10, 28, 8/3
+    
+    # Run for each dimension
+    for i in range(3):
+        # Store dim(t) values for both initial conditions
+        dim_values = []
+        
+        # Plot dim(t) for both initial conditions on same graph
+        for u_0, label in zip(initial_conditions, ic_labels):
+            u_values = RK4_solver(u_0, h, sigma, rho, beta)
+            time_values = np.arange(0, 50 + h, h)
+            plt.plot(time_values, u_values[:, i], label=f"{label}")
+            dim_values.append(u_values[:, i])
+            
+        plt.xlabel(r"$t$")
+        plt.ylabel(rf"${dimensions[i]}(t)$")
+        plt.title(rf"Initial Condition Comparison for ${dimensions[i]}(t)$")
+        plt.legend()
+        plt.savefig(f"./outputs/q4/rk4_ic_{dimensions[i]}.png", dpi=300)
+        plt.cla()
+        
+        # Plot |dim_1(t) - dim_2(t)| on semilog-y graph
+        diff = np.abs(dim_values[1] - dim_values[0])
+        plt.semilogy(time_values, diff, label=rf"$|{dimensions[i]}_1(t) - {dimensions[i]}_2(t)|$")
+        plt.xlabel(r"$t$")
+        plt.ylabel(rf"$|{dimensions[i]}_1(t) - {dimensions[i]}_2(t)|$")
+        plt.title(rf"Absolute Difference for ${dimensions[i]}(t)$")
+        plt.legend()
+        plt.savefig(f"./outputs/q4/rk4_ic_diff_{dimensions[i]}.png", dpi=300)
+        plt.cla()
+\end{lstlisting}
+
+The following plots were obtained for each dimension: \\
+\begin{center}
+        \textbf{Dimension: $x(t)$}
+\end{center}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q4/rk4_ic_x.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q4/rk4_ic_diff_x.png}
+
+\newpage
+\begin{center}
+        \textbf{Dimension: $y(t)$}
+\end{center}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q4/rk4_ic_y.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q4/rk4_ic_diff_y.png}
+
+\begin{center}
+        \textbf{Dimension: $z(t)$}
+\end{center}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q4/rk4_ic_z.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q4/rk4_ic_diff_z.png}
+
+We observe that in all three dimensions, the trajectories for the original and perturbed initial conditions match closely up until around $t\approx 30$, where the trajectories start diverging slightly. Then by $t\approx 33$, they really start to diverge significantly. Since the Lorenz system is chaotic, we expect that even a very small perturbation in the initial conditions will lead to significant divergence in the trajectories after some time. This is exactly what we see in the plots. 
+
+The semilog-y plots of the absolute differences show that the difference remains very small until shortly after $t=10$. After which, the difference starts to grow exponentially (which appears linear on the semilog-y plot). This growth peaks and plateaus shortly after $t=30$ and where we saw the divergence in the trajectories. The magnitude of the error at the end matches the scale of the trajectories themselves on the order of $10^1$. This indicates that the two trajectories have completely diverged from each other.
+
+\newpage
 \question{Time Step Effects and Numerical Stability}
 For Case D, repeat the computation with:
 \[ \Delta t = 0.02, 0.01, 0.005\]
@@ -338,6 +412,45 @@ For Case D, repeat the computation with:
 \end{itemize}
 
 \solution
-dummy text
+
+The code for this question is very similar to the code used in Question 3, except instead of looping through the parameter sets, we loop through the different time steps and fix the parameters to Case D. The following plots were obtained for each time step: \\
+
+\begin{center}
+    \textbf{Case 1:} $\Delta t = 0.02$
+\end{center}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_x_02.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_y_02.png}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_z_02.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_phase_portrait_02.png}
+
+\textbf{Comments:} For this case, since $\Delta t$ is relatively large, the trajectory looks  and distorted. While the overall shape of the Lorenz attractor is still present, the trajectory itself is not very smooth and appears to have a lot of numerical noise. The time step is too large to capture the trajectory of the initial condition in full detail.
+
+\begin{center}
+    \textbf{Case 2:} $\Delta t = 0.01$
+\end{center}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_x_01.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_y_01.png}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_z_01.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_phase_portrait_01.png}
+
+\textbf{Comments:} In this case, the trajectory looks much smoother and more detailed than in Case 1. The overall shape of the Lorenz attractor is still present, but now we can see more of the intricate looping behavior of the trajectory. The time step is small enough to capture the dynamics of the system more accurately and smoothly. However, we can still see that the trajectory is not perfectly smooth and there is still some numerical noise present.
+
+\begin{center}
+    \textbf{Case 3:} $\Delta t = 0.005$
+\end{center}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_x_005.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_y_005.png}
+
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_z_005.png}
+\includegraphics[width=0.5\textwidth]{../outputs/q5/rk4_phase_portrait_005.png}
+
+\textbf{Comments:} In this case, the phase portrait looks very smooth and detailed. The trajectory itself is different from the previous cases where we see a larger gaps in the loops on the outer wings of the attractor.
+
+In general, we observe that the trajectories for each time step differs from one another. Which is expected as numerical errors accumulate over time. However, like question 2, the trajectories for smaller time steps match more closely with each other for a longer duration before diverging due to the chaotic nature of the system.  
 
 \end{document}

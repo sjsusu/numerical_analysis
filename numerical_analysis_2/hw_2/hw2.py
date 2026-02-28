@@ -154,3 +154,86 @@ if __name__ == "__main__":
         plt.savefig(rf"./outputs/rk4_{label}_phase_portrait.png", dpi=300)
         plt.close(fig)
     
+    # ---------------------------------------------
+    # Question 4
+    # ---------------------------------------------
+    
+    initial_conditions = np.array([
+        [1,1,1],
+        [1+1e-8, 1, 1]
+    ])
+    dimensions = ["x", "y", "z"]
+    ic_labels = ["original", "perturbed"]
+    
+    # Pick baseline dt
+    h = 0.01
+    # Use Case C parameters for this question
+    sigma, rho, beta = 10, 28, 8/3
+    
+    # Run for each dimension
+    for i in range(3):
+        # Store dim(t) values for both initial conditions
+        dim_values = []
+        
+        # Plot dim(t) for both initial conditions on same graph
+        for u_0, label in zip(initial_conditions, ic_labels):
+            u_values = RK4_solver(u_0, h, sigma, rho, beta)
+            time_values = np.arange(0, 50 + h, h)
+            plt.plot(time_values, u_values[:, i], label=f"{label}")
+            dim_values.append(u_values[:, i])
+            
+        plt.xlabel(r"$t$")
+        plt.ylabel(rf"${dimensions[i]}(t)$")
+        plt.title(rf"Initial Condition Comparison for ${dimensions[i]}(t)$")
+        plt.legend()
+        plt.savefig(f"./outputs/q4/rk4_ic_{dimensions[i]}.png", dpi=300)
+        plt.cla()
+        
+        # Plot |dim_1(t) - dim_2(t)| on semilog-y graph
+        diff = np.abs(dim_values[1] - dim_values[0])
+        plt.semilogy(time_values, diff, label=rf"$|{dimensions[i]}_1(t) - {dimensions[i]}_2(t)|$")
+        plt.xlabel(r"$t$")
+        plt.ylabel(rf"$|{dimensions[i]}_1(t) - {dimensions[i]}_2(t)|$")
+        plt.title(rf"Absolute Difference for ${dimensions[i]}(t)$")
+        plt.legend()
+        plt.savefig(f"./outputs/q4/rk4_ic_diff_{dimensions[i]}.png", dpi=300)
+        plt.cla()
+        
+    # ---------------------------------------------
+    # Question 5
+    # ---------------------------------------------
+    
+    time_steps = [0.02, 0.01, 0.005]
+    file_labels = ["_02", "_01", "_005"]
+    dimensions = ["x", "y", "z"]
+    
+    # Use Case D parameters
+    sigma, rho, beta = 10, 40, 8/3
+    u_0 = np.array([1, 1, 1])
+    
+    # Generate plots for each time step
+    for h, label in zip(time_steps, file_labels):
+        u_values = RK4_solver(u_0, h, sigma, rho, beta)
+        time_values = np.arange(0, 50 + h, h)
+        
+        # Generate time plots for each dimension
+        for i, dim in enumerate(dimensions):
+            fig, ax = plt.subplots()
+            ax.plot(time_values, u_values[:, i], label=f"${dim}(t)$", color=default_colors[i])
+            ax.set_xlabel(r"$t$")
+            ax.set_ylabel(rf"${dim}(t)$")
+            ax.set_title(rf'RK4 for Case D with $\Delta t = {h}$')
+            ax.legend()
+            fig.savefig(rf"./outputs/q5/rk4_{dim}{label}.png", dpi=300)
+            plt.close(fig)
+            
+        # Generate phase portrait
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot(u_values[:, 0], u_values[:, 1], u_values[:, 2], color=default_colors[3])
+        ax.set_xlabel(r'$x$')
+        ax.set_ylabel(r'$y$')
+        ax.set_zlabel(r'$z$')
+        ax.set_title(rf'Phase Portrait for Case D with $\Delta t = {h}$')
+        fig.savefig(rf"./outputs/q5/rk4_phase_portrait{label}.png", dpi=300)
+        plt.close(fig)
