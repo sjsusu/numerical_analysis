@@ -1,0 +1,28 @@
+Total iterations: 2
+$s_{3}$: 2.000000
+$F(s_{3})$: 4.440892e-16
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+$n$ & $s_n$ & $F(s_n)$ \\
+\hline
+$0$ & $1.273240$ & $-7.267605e-01$ \\
+\hline
+$1$ & $2.273240$ & $2.732395e-01$ \\
+\hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$n$ & $s_{n-1}$ & $s_n$ & $s_{n+1}$ & $F(s_{n+1})$ \\
+\hline
+$1$ & $1.273240$ & $2.273240$ & $2.000000$ & $-1.554312e-15$ \\
+\hline
+$2$ & $2.273240$ & $2.000000$ & $2.000000$ & $4.440892e-16$ \\
+\hline
+\end{tabular}
+\end{center}
